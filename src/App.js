@@ -15,10 +15,33 @@ class App extends Component {
     }
   }
 
-  handleCreateEvent = (event, id) => {
-    console.log(id, event.target)
+  handleCreateEvent = (_, id) => {
+    console.log(id)
+    const selectedDayIndex = id[1];
+    const selectedHourIndex = id[4] ? `${id[3]}${id[4]}` : id[3];
+    const selectedDayIndexNumber = parseInt(selectedDayIndex, 10);
+    const selectedHourIndexNumber = parseInt(selectedHourIndex, 10);
 
-    this.setState({ activeEvent: id })
+    // console.log(selectedDayIndexNumber, selectedHourIndexNumber)
+    // console.log("start of the week date: ", this.state.currentWeekData.dateFrom)
+    
+    const dateobj = new Date(this.state.currentWeekData.dateFrom); 
+    const startDay = dateobj.getDay();
+    const startHour = dateobj.getHours();
+    const selectedDay = startDay + selectedDayIndexNumber + 1; // add 1 for array indexing
+    const selectedHour = startHour + selectedHourIndexNumber;
+    // console.log(selectedDay, selectedHour)
+    
+    // console.log("start day index: ", startDay)
+    // console.log("start hour index: ", startHour)
+
+    dateobj.setDate(selectedDay);
+    dateobj.setHours(selectedHour);
+    const selectedDate = dateobj;
+
+    console.log("selected date: ", selectedDate)
+
+    this.setState({ activeEvent: id });
   }
 
   render() {
@@ -35,6 +58,7 @@ class App extends Component {
             })}
           </div>
           { Object.values(currentWeekData.events).map((day, keyDay)=>{
+            let updatedKeyHour = -1;
             return (
               <div key={keyDay} className="day">
                 <div className="day-label">
@@ -42,8 +66,9 @@ class App extends Component {
                   <div>{weekDays[keyDay].date}</div>
                 </div>
                 { day.map((event, keyHour) => {
-                  const emptyHourId = `d${keyDay}h${keyHour}`;
-                  const isCurrentHourActive = activeEvent === emptyHourId;
+                  updatedKeyHour += 1;
+                  let hourId = `d${keyDay}h${updatedKeyHour}`;
+                  const isCurrentHourActive = activeEvent === hourId;
                   const conditionsPopupTop = ['h18', 'h19', 'h20', 'h21', 'h22', 'h23', 'h24'];
                   const conditionsPopupRight = ['d0', 'd1'];
                   const isPopupTop = activeEvent ? conditionsPopupTop.some(condition => activeEvent.includes(condition)) : false;
@@ -51,14 +76,31 @@ class App extends Component {
                   const popupClass = `create-event-popup ${isPopupTop && 'popup-top'} ${isPopupRight && 'popup-right'}`;
 
                   if (event.id) {
-                    return <div key={keyHour} className={`hour ts${event.timeSpan} l${event.label}`}>{event.name || ''}</div>
+                    if (event.timeSpan > 1) {
+                      const otherSpanedHours = event.timeSpan - 1;
+                      const timeSpanArray = [...Array(otherSpanedHours).keys()];
+                      const lastKeyHour = updatedKeyHour;
+                      return (
+                        <div key={hourId} className={`hour-wrapper l${event.label}`}>
+                          <div key={hourId} className={`${hourId} hour ts1`}>{event.name}</div>
+                          { timeSpanArray.map((_, timeSlotIndex) => {
+                            updatedKeyHour = lastKeyHour + timeSlotIndex + 1;
+                            hourId = `d${keyDay}h${updatedKeyHour}`;
+
+                            return <div key={hourId} className={`${hourId} hour ts1`}></div>
+                          })}
+                        </div>
+                      )
+                    }
+
+                    return <div key={hourId} className={`${hourId} hour-wrapper hour ts${event.timeSpan} l${event.label}`}>{event.name || ''}</div>;
                   }
 
                   return (
                     <div
-                      key={emptyHourId}
-                      className={ isCurrentHourActive ? 'hour is-active' : 'hour' }
-                      onClick={(event) => this.handleCreateEvent(event, emptyHourId)}
+                      key={hourId}
+                      className={ isCurrentHourActive ? 'hour is-active' : `${hourId} hour` }
+                      onClick={(event) => this.handleCreateEvent(event, hourId)}
                     >
                       { isCurrentHourActive && (
                         <div className={popupClass}>
