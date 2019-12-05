@@ -8,11 +8,27 @@ class App extends Component {
     super()
 
     this.handleCreateEvent = this.handleCreateEvent.bind(this);
+    this.handleSaveEvent = this.handleSaveEvent.bind(this);
 
     this.state = {
       activeEvent: null,
+      activeEventDetails: {},
       currentWeekData: currentWeekData,
     }
+  }
+
+  handleSaveEvent = (_, id) => {
+    console.log("save")
+    
+    // const selectedHourIndex = id[4] ? `${id[3]}${id[4]}` : id[3];
+    // const selectedDate = this.state.activeEventDetails.selectedDate;
+    // const pickedDateIndex = `${selectedDate.getDay() + 1}-${selectedDate.getMonth() + 1}-${selectedDate.getFullYear()}`
+    // // let pickedDay = this.state.currentWeekData.events[selectedDayIndex];
+    // let pickedDay = this.state.currentWeekData.events[pickedDateIndex];
+    // const eventDetails = {
+    //   id: '20', name: 'New!', label: 3, timeSpan: 1,
+    // }
+    // pickedDay[selectedHourIndex] = eventDetails;
   }
 
   handleCreateEvent = (_, id) => {
@@ -21,19 +37,12 @@ class App extends Component {
     const selectedHourIndex = id[4] ? `${id[3]}${id[4]}` : id[3];
     const selectedDayIndexNumber = parseInt(selectedDayIndex, 10);
     const selectedHourIndexNumber = parseInt(selectedHourIndex, 10);
-
-    // console.log(selectedDayIndexNumber, selectedHourIndexNumber)
-    // console.log("start of the week date: ", this.state.currentWeekData.dateFrom)
     
     const dateobj = new Date(this.state.currentWeekData.dateFrom); 
     const startDay = dateobj.getDay();
     const startHour = dateobj.getHours();
     const selectedDay = startDay + selectedDayIndexNumber + 1; // add 1 for array indexing
     const selectedHour = startHour + selectedHourIndexNumber;
-    // console.log(selectedDay, selectedHour)
-    
-    // console.log("start day index: ", startDay)
-    // console.log("start hour index: ", startHour)
 
     dateobj.setDate(selectedDay);
     dateobj.setHours(selectedHour);
@@ -41,11 +50,15 @@ class App extends Component {
 
     console.log("selected date: ", selectedDate)
 
-    this.setState({ activeEvent: id });
+    const activeEventDetails = {
+      selectedDate,
+    }
+
+    this.setState({ activeEvent: id, activeEventDetails: activeEventDetails });
   }
 
   render() {
-    const { currentWeekData, activeEvent } = this.state;
+    const { currentWeekData, activeEvent, activeEventDetails } = this.state;
     return (
       <div className="App">
         <div className="header">
@@ -105,6 +118,7 @@ class App extends Component {
                       { isCurrentHourActive && (
                         <div className={popupClass}>
                           <input type="text" />
+                          <button onClick={(event) => this.handleSaveEvent(event, hourId)}>Save</button>
                         </div>
                       )}
                     </div>
@@ -114,20 +128,6 @@ class App extends Component {
             )
           })}
         </div>
-        {/* <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header> */}
       </div>
     );
   }

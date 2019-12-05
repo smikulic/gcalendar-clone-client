@@ -14,7 +14,7 @@ export const currentWeekData = {
   dateTo: 'December 08, 2019 23:00:00',
   dateFormatted: 'December 2019',
   events: {
-    '02-12-2019': [
+    '2-12-2019': [
       {},
       {},
       {},
@@ -37,7 +37,7 @@ export const currentWeekData = {
       {},
       {},
     ],
-    '03-12-2019': [
+    '3-12-2019': [
       {},
       {},
       {},
@@ -62,7 +62,7 @@ export const currentWeekData = {
       {},
       {},
     ],
-    '04-12-2019': [
+    '4-12-2019': [
       {},
       {},
       {},
@@ -87,7 +87,7 @@ export const currentWeekData = {
       {},
       {},
     ],
-    '05-12-2019': [
+    '5-12-2019': [
       {},
       {},
       {},
@@ -112,7 +112,7 @@ export const currentWeekData = {
       {},
       {},
     ],
-    '06-12-2019': [
+    '6-12-2019': [
       {},
       {},
       {},
@@ -136,7 +136,7 @@ export const currentWeekData = {
       {},
       {},
     ],
-    '07-12-2019': [
+    '7-12-2019': [
       {},
       {},
       {},
@@ -162,7 +162,7 @@ export const currentWeekData = {
       {},
       {},
     ],
-    '08-12-2019': [
+    '8-12-2019': [
       {},
       {},
       {},
