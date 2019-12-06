@@ -13,7 +13,7 @@ export const eventsMock = [
     startDate: 'Fri Dec 06 2019 18:00:00 GMT+0100 (Central European Standard Time)',
     endDate: 'Fri Dec 06 2019 20:00:00 GMT+0100 (Central European Standard Time)',
     description: 'Make a reservation!',
-    label: 2,
+    label: 3,
   },
   {
     id: '100abc3',
@@ -21,7 +21,7 @@ export const eventsMock = [
     startDate: 'Tue Dec 03 2019 14:00:00 GMT+0100 (Central European Standard Time)',
     endDate: 'Tue Dec 03 2019 17:00:00 GMT+0100 (Central European Standard Time)',
     description: null,
-    label: 3,
+    label: 10,
   },
   {
     id: '100abc4',

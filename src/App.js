@@ -12,14 +12,15 @@ class App extends Component {
     this.handleSaveEvent = this.handleSaveEvent.bind(this);
 
     console.log(getCurrentWeek(new Date()))
-    console.log(transformDbResponse().weekDataFormatted)
+    console.log(transformDbResponse().events)
 
     this.state = {
       // currentWeek: getCurrentWeek(new Date('Mon Dec 10 2019 00:00:00 GMT+0100 (Central European Standard Time)')),
       currentWeek: getCurrentWeek(new Date()),
       activeEvent: null,
       activeEventDetails: {},
-      currentWeekData: currentWeekData,
+      // currentWeekData: currentWeekData,
+      currentWeekData: transformDbResponse(),
     }
   }
 
@@ -64,7 +65,7 @@ class App extends Component {
   }
 
   render() {
-    const { currentWeekData, activeEvent, currentWeek, activeEventDetails } = this.state;
+    const { currentWeekData, activeEvent, currentWeek } = this.state;
 
     return (
       <div className="App">
