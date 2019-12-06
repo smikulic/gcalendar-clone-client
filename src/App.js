@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
 import './App.css';
-import { weekDays, totalHours, currentWeekData } from './mockData';
+import { totalHours, currentWeekData } from './mockData';
+import { getCurrentWeek } from './getCurrentWeek';
+import { transformDbResponse } from './transformDbResponse';
 
 class App extends Component {
   constructor() {
@@ -10,7 +11,12 @@ class App extends Component {
     this.handleCreateEvent = this.handleCreateEvent.bind(this);
     this.handleSaveEvent = this.handleSaveEvent.bind(this);
 
+    console.log(getCurrentWeek(new Date()))
+    console.log(transformDbResponse().weekDataFormatted)
+
     this.state = {
+      // currentWeek: getCurrentWeek(new Date('Mon Dec 10 2019 00:00:00 GMT+0100 (Central European Standard Time)')),
+      currentWeek: getCurrentWeek(new Date()),
       activeEvent: null,
       activeEventDetails: {},
       currentWeekData: currentWeekData,
@@ -58,7 +64,8 @@ class App extends Component {
   }
 
   render() {
-    const { currentWeekData, activeEvent, activeEventDetails } = this.state;
+    const { currentWeekData, activeEvent, currentWeek, activeEventDetails } = this.state;
+
     return (
       <div className="App">
         <div className="header">
@@ -75,8 +82,8 @@ class App extends Component {
             return (
               <div key={keyDay} className="day">
                 <div className="day-label">
-                  <div>{weekDays[keyDay].label}</div>
-                  <div>{weekDays[keyDay].date}</div>
+                  <div>{currentWeek.weekLabels[keyDay].label}</div>
+                  <div>{currentWeek.weekLabels[keyDay].date}</div>
                 </div>
                 { day.map((event, keyHour) => {
                   updatedKeyHour += 1;

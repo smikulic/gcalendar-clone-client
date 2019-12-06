@@ -1,11 +1,36 @@
-export const weekDays = [
-  { label: 'Mon', date: '2' },
-  { label: 'Tue', date: '3' },
-  { label: 'Wed', date: '4' },
-  { label: 'Thu', date: '5' },
-  { label: 'Fri', date: '6' },
-  { label: 'Sat', date: '7' },
-  { label: 'Sun', date: '8' },
+export const eventsMock = [
+  {
+    id: '100abc1',
+    name: 'Buy a ticket to Berlin',
+    startDate: 'Thu Dec 05 2019 22:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Thu Dec 05 2019 23:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 0,
+  },
+  {
+    id: '100abc2',
+    name: 'Play padel',
+    startDate: 'Fri Dec 06 2019 18:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Fri Dec 06 2019 20:00:00 GMT+0100 (Central European Standard Time)',
+    description: 'Make a reservation!',
+    label: 2,
+  },
+  {
+    id: '100abc3',
+    name: 'Interview',
+    startDate: 'Tue Dec 03 2019 14:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Tue Dec 03 2019 17:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 3,
+  },
+  {
+    id: '100abc4',
+    name: 'Coffee',
+    startDate: 'Tue Dec 03 2019 08:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Tue Dec 03 2019 09:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 0,
+  },
 ];
 export const totalHours = ['0:00','1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00',
                           '13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
