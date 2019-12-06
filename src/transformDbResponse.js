@@ -1,18 +1,16 @@
-import { eventsMock } from './mockData';
-
-export const sortWeeklyEvents = () => {
-  let sortedWeeklyEvents = eventsMock
+const sortWeeklyEvents = (events) => {
+  let sortedWeeklyEvents = events
   return sortedWeeklyEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
 }
 
-export const transformDbResponse = () => {
-  const sortedWeeklyEvents = sortWeeklyEvents()
+export const transformDbResponse = (events) => {
+  const sortedWeeklyEvents = sortWeeklyEvents(events)
   const daysInAWeek = [...Array(7).keys()]
   const hoursInADay = [...Array(24).keys()]
 
   // get all the days in a week filled with events data
   const eventsPerDay = daysInAWeek.map((_, dayIndex) => {
-    const sortedEventsPerDay = sortedWeeklyEvents.filter(event => new Date(event.startDate).getDay() === dayIndex)
+    const sortedEventsPerDay = sortedWeeklyEvents.filter(event => new Date(event.startDate).getDay() === dayIndex + 1)
     const transformedEvents = sortedEventsPerDay.map(event => {    
       const eventStartDateHour = new Date(event.startDate).getHours()
       const eventEndDateHour = new Date(event.endDate).getHours()

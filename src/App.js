@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { totalHours, currentWeekData } from './mockData';
+import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
 import { transformDbResponse } from './transformDbResponse';
 
@@ -11,21 +11,36 @@ class App extends Component {
     this.handleCreateEvent = this.handleCreateEvent.bind(this);
     this.handleSaveEvent = this.handleSaveEvent.bind(this);
 
-    console.log(getCurrentWeek(new Date()))
-    console.log(transformDbResponse().events)
-
     this.state = {
-      // currentWeek: getCurrentWeek(new Date('Mon Dec 10 2019 00:00:00 GMT+0100 (Central European Standard Time)')),
       currentWeek: getCurrentWeek(new Date()),
       activeEvent: null,
       activeEventDetails: {},
-      // currentWeekData: currentWeekData,
-      currentWeekData: transformDbResponse(),
+      currentWeekData: transformDbResponse(eventsMock),
+      clonedEvents: eventsMock,
     }
   }
 
   handleSaveEvent = (_, id) => {
-    console.log("save")
+    const { activeEventDetails } = this.state;
+    const selectedDateStart = activeEventDetails.selectedDateStart
+    const selectedDateEnd = activeEventDetails.selectedDateEnd
+
+    const newEvent = {
+      id: '100abc5',
+      name: 'Test yay',
+      startDate: selectedDateStart.toString(),
+      endDate: selectedDateEnd.toString(),
+      description: null,
+      label: 3,
+    };
+
+    const updatedEvents = [...this.state.clonedEvents]
+    updatedEvents.push(newEvent)
+
+    this.setState({
+      clonedEvents: updatedEvents,
+      currentWeekData: transformDbResponse(updatedEvents),
+    })
     
     // const selectedHourIndex = id[4] ? `${id[3]}${id[4]}` : id[3];
     // const selectedDate = this.state.activeEventDetails.selectedDate;
@@ -39,26 +54,27 @@ class App extends Component {
   }
 
   handleCreateEvent = (_, id) => {
-    console.log(id)
     const selectedDayIndex = id[1];
     const selectedHourIndex = id[4] ? `${id[3]}${id[4]}` : id[3];
     const selectedDayIndexNumber = parseInt(selectedDayIndex, 10);
     const selectedHourIndexNumber = parseInt(selectedHourIndex, 10);
     
-    const dateobj = new Date(this.state.currentWeekData.dateFrom); 
-    const startDay = dateobj.getDay();
-    const startHour = dateobj.getHours();
+    const selectedDateStart = new Date(this.state.currentWeekData.dateFrom);
+    const selectedDateEnd = new Date(this.state.currentWeekData.dateFrom);
+    const startDay = selectedDateStart.getDay();
+    const startHour = selectedDateStart.getHours();
     const selectedDay = startDay + selectedDayIndexNumber + 1; // add 1 for array indexing
     const selectedHour = startHour + selectedHourIndexNumber;
+    const selectedHourEnd = selectedHour + 1; // 1 can be dynamic based on expand or iput selected date
 
-    dateobj.setDate(selectedDay);
-    dateobj.setHours(selectedHour);
-    const selectedDate = dateobj;
-
-    console.log("selected date: ", selectedDate)
+    selectedDateStart.setDate(selectedDay);
+    selectedDateStart.setHours(selectedHour);
+    selectedDateEnd.setDate(selectedDay);
+    selectedDateEnd.setHours(selectedHourEnd);
 
     const activeEventDetails = {
-      selectedDate,
+      selectedDateStart,
+      selectedDateEnd,
     }
 
     this.setState({ activeEvent: id, activeEventDetails: activeEventDetails });
