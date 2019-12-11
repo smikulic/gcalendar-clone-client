@@ -31,13 +31,6 @@
   height: 100%;
 }
 
-.day {
-  outline: 1px solid lightgray;
-  position: relative;
-  min-width: 7rem;
-  width: 100%;
-}
-
 .hours-container {
   display: flex;
   flex-direction: column;
@@ -72,10 +65,16 @@
   right: -17rem;
 }
 
+.days-axis {
+  display: flex;
+  margin: 0.5rem 0 0 0;
+  padding: 0 1rem;
+  min-width: 42rem;
+}
+
 .day-label {
   padding: 0.1rem 0;
-  min-width: 7rem;
-  width: 100%;
+  width: 14.2%;
   font-size: 0.75rem;
   color: gray;
   outline: 1px solid white;
@@ -93,37 +92,9 @@
   visibility: hidden;
 }
 
-.hour-wrapper {
-  outline: 1px solid lightgray;
-}
-
-.hour-wrapper .hour {
-  outline: 1px solid transparent;
-}
-
-.hour.ts1 { height: 2rem; }
-.hour.ts2 { height: 4rem; }
-.hour.ts3 { height: 6rem; }
-.hour.ts4 { height: 8rem; }
-.hour.ts5 { height: 10rem; }
-.hour.ts6 { height: 12rem; }
-.hour.ts7 { height: 14rem; }
-.hour.ts8 { height: 16rem; }
-.hour.ts9 { height: 18rem; }
-.hour.ts10 { height: 20rem; }
-.hour.ts11 { height: 22rem; }
-.hour.ts12 { height: 24rem; }
-.hour.ts13 { height: 26rem; }
-.hour.ts14 { height: 28rem; }
-.hour.ts15 { height: 30rem; }
-
 .hour.l0 { background-color: #0e61b9; }
 .hour.l3 { background-color: #F6BF26; }
 .hour.l10 { background-color: #D50000; }
-
-.hour-wrapper.l0 { background-color: #0e61b9; }
-.hour-wrapper.l3 { background-color: #F6BF26; }
-.hour-wrapper.l10 { background-color: #D50000; }
 
 .hour.between {
   outline: 0;

@@ -18,6 +18,7 @@ class App extends Component {
       activeEventDetails: {},
       currentWeekData: transformDbResponse(eventsMock),
       clonedEvents: eventsMock,
+      totalDaysByWeek: [...Array(7).keys()],
       totalHoursByWeek: [...Array(168).keys()], // 24 hours * 7 days
       dateFrom: 'December 02, 2019 00:00:00',
       dateTo: 'December 08, 2019 23:00:00',
@@ -67,8 +68,8 @@ class App extends Component {
       activeEvent,
       currentWeek,
       clonedEvents,
+      totalDaysByWeek,
       totalHoursByWeek,
-      dateFrom,
     } = this.state;
 
     let topRange = []
@@ -81,10 +82,25 @@ class App extends Component {
     const conditionsPopupTop = topRange
     const conditionsPopupRight = [...Array(72).keys()]
 
+    console.log(currentWeek)
+
     return (
       <div className="App">
         <div className="header">
           {currentWeekData.dateFormatted}
+        </div>
+        <div className="days-axis">
+          <div className="hours-axis">
+            <div className="hour-label">0:00</div>
+          </div>
+          { totalDaysByWeek.map((day, keyDay) => {
+            return (
+              <div key={keyDay} className="day-label">
+                <div>{currentWeek.weekLabels[keyDay].label}</div>
+                <div>{currentWeek.weekLabels[keyDay].date}</div>
+              </div>
+            )
+          })}
         </div>
         <div className="week-overview">
           <div className="hours-axis">
@@ -92,20 +108,9 @@ class App extends Component {
               return <div key={key} className="hour-label">{hour}</div>
             })}
           </div>
-          {/* { Object.values(currentWeekData.events).map((day, keyDay)=>{
-            return (
-              <div key={keyDay} className="day">
-                <div className="day-label">
-                  <div>{currentWeek.weekLabels[keyDay].label}</div>
-                  <div>{currentWeek.weekLabels[keyDay].date}</div>
-                </div>
-              </div>
-            )
-          })} */}
-
           <div className="hours-container">
             { totalHoursByWeek.map((_, hourKey) => {
-                const dateByHour = new Date(dateFrom).setHours(hourKey)
+                const dateByHour = new Date(currentWeek.weekStart).setHours(hourKey)
                 const isCurrentHourActive = activeEvent === hourKey
                 let hourNode = (
                   <div key={hourKey} className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}>
