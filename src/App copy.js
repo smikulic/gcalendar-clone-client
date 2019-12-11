@@ -17,9 +17,6 @@ class App extends Component {
       activeEventDetails: {},
       currentWeekData: transformDbResponse(eventsMock),
       clonedEvents: eventsMock,
-      totalHoursByWeek: [...Array(168).keys()], // 24 hours * 7 days
-      dateFrom: 'December 02, 2019 00:00:00',
-      dateTo: 'December 08, 2019 23:00:00',
     }
   }
 
@@ -84,14 +81,7 @@ class App extends Component {
   }
 
   render() {
-    const {
-      currentWeekData,
-      activeEvent,
-      currentWeek,
-      clonedEvents,
-      totalHoursByWeek,
-      dateFrom,
-    } = this.state;
+    const { currentWeekData, activeEvent, currentWeek } = this.state;
 
     return (
       <div className="App">
@@ -104,7 +94,7 @@ class App extends Component {
               return <div key={key} className="hour-label">{hour}</div>
             })}
           </div>
-          {/* { Object.values(currentWeekData.events).map((day, keyDay)=>{
+          { Object.values(currentWeekData.events).map((day, keyDay)=>{
             let updatedKeyHour = -1;
             return (
               <div key={keyDay} className="day">
@@ -160,47 +150,7 @@ class App extends Component {
                 })}
               </div>
             )
-          })} */}
-
-          <div className="hours-container">
-            { totalHoursByWeek.map((hour, hourKey) => {
-                const dateByHour = new Date(dateFrom).setHours(hourKey)
-                let hourNode = <div key={hourKey} className="hour"></div>
-
-                clonedEvents.forEach((event, eventKey) => {
-                  const hourDate = new Date(dateByHour)
-                  const eventDateStart = new Date(event.startDate)
-                  const eventDateEnd = new Date(event.endDate)
-                  const isEqualDay = (hourDate.toDateString() === eventDateStart.toDateString()) || 
-                                    (hourDate.toDateString() === eventDateEnd.toDateString())
-                  
-                  if (isEqualDay) {
-                    const isEqualHourStart = hourDate.getHours() === eventDateStart.getHours()
-                    const isBetweenEventDuration = hourDate > eventDateStart && hourDate < eventDateEnd
-
-                    if (isEqualHourStart) {
-                      console.log("UTC DATE: ", new Date(dateByHour).toDateString())
-                      console.log("HOUR DATE: ", new Date(dateByHour).getHours())
-                      console.log("EVENT DATE: ", new Date(eventDateStart).getHours())
-                      console.log(event)
-
-                      hourNode = <div key={hourKey} className={`hour l${event.label}`}>{event.name}</div>
-                    }
-                    
-                    if (isBetweenEventDuration) {
-                      console.log("UTC DATE: ", new Date(dateByHour).toDateString())
-                      console.log("HOUR DATE: ", new Date(dateByHour).getHours())
-                      console.log("EVENT DATE: ", new Date(eventDateEnd).getHours())
-                      console.log(event)
-
-                      hourNode = <div key={hourKey} className={`hour between l${event.label}`}></div>
-                    }
-                  }
-                })
-
-                return hourNode
-            })}
-          </div>
+          })}
         </div>
       </div>
     );
