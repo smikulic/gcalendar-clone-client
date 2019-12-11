@@ -39,16 +39,36 @@
   max-height: 48rem; /* 24 hours * hour height */
 }
 
-.hour {
+.hour-wrapper {
   outline: 1px solid lightgray;
   position: relative;
-  width: 100%;
   width: 14.2%;
   height: 2rem;
 }
 
+.hour {
+  position: absolute;
+  padding: 0 0.2rem;
+  width: 90%;
+  height: 1.9rem;
+  border-radius: 3px;
+  text-align: left;
+}
+
+.hour .event-name,
+.hour .event-time {
+  font-size: 0.7rem;
+  font-weight: 300;
+  color: white;
+  -webkit-user-select: none;
+}
+
+.hour .event-name {
+  font-weight: 400;
+}
+
 .create-event-popup {
-  z-index: 1;
+  z-index: 2;
   position: absolute;
   right: 12rem;
   width: 16rem;
@@ -92,9 +112,45 @@
   visibility: hidden;
 }
 
+.hour.scheduled {
+  z-index: 1;
+  cursor: pointer;
+}
+
 .hour.l0 { background-color: #0e61b9; }
 .hour.l3 { background-color: #F6BF26; }
 .hour.l10 { background-color: #D50000; }
+
+.hour.s2 { height: 3.8rem; }
+.hour.s3 { height: 5.8rem; }
+.hour.s4 { height: 7.8rem; }
+.hour.s5 { height: 9.8rem; }
+
+
+/* .hour-wrapper {
+  display: inline-block;
+  width: 14.2%;
+} */
+
+/* .hour.s1 {
+  display: inline-block;
+  width: 50%;
+  float: left;
+}
+
+.hour.s2 {
+  display: inline-block;
+  width: 33.33%;
+  float: left;
+}
+
+.hour-wrapper.s2 {
+  width: 66.66%;
+}
+
+.hour-wrapper.s2 .s1 {
+  width: 50%;
+} */
 
 .hour.between {
   outline: 0;

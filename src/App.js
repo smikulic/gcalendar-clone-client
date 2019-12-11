@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
-import { transformDbResponse } from './transformDbResponse';
+// import { transformDbResponse } from './transformDbResponse';
 
 class App extends Component {
   constructor() {
@@ -16,12 +16,9 @@ class App extends Component {
       currentWeek: getCurrentWeek(new Date()),
       activeEvent: null,
       activeEventDetails: {},
-      currentWeekData: transformDbResponse(eventsMock),
       clonedEvents: eventsMock,
       totalDaysByWeek: [...Array(7).keys()],
       totalHoursByWeek: [...Array(168).keys()], // 24 hours * 7 days
-      dateFrom: 'December 02, 2019 00:00:00',
-      dateTo: 'December 08, 2019 23:00:00',
     }
   }
 
@@ -64,7 +61,6 @@ class App extends Component {
 
   render() {
     const {
-      currentWeekData,
       activeEvent,
       currentWeek,
       clonedEvents,
@@ -82,16 +78,16 @@ class App extends Component {
     const conditionsPopupTop = topRange
     const conditionsPopupRight = [...Array(72).keys()]
 
-    console.log(currentWeek)
-
     return (
       <div className="App">
         <div className="header">
-          {currentWeekData.dateFormatted}
+          {currentWeek.weekStart.toLocaleString('default', { month: 'long' })}
+          {' '}
+          {currentWeek.weekStart.getFullYear()}
         </div>
         <div className="days-axis">
           <div className="hours-axis">
-            <div className="hour-label">0:00</div>
+            <div className="hour-label">0</div>
           </div>
           { totalDaysByWeek.map((day, keyDay) => {
             return (
@@ -113,13 +109,15 @@ class App extends Component {
                 const dateByHour = new Date(currentWeek.weekStart).setHours(hourKey)
                 const isCurrentHourActive = activeEvent === hourKey
                 let hourNode = (
-                  <div key={hourKey} className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}>
-                    { isCurrentHourActive && (
-                      <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
-                        <input type="text" />
-                        <button onClick={(event) => this.handleSaveEvent(event, hourKey)}>Save</button>
-                      </div>
-                    )}
+                  <div id={hourKey} key={hourKey} className={`hour-wrapper`}>
+                    <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}>
+                      { isCurrentHourActive && (
+                        <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
+                          <input type="text" />
+                          <button onClick={(event) => this.handleSaveEvent(event, hourKey)}>Save</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )
 
@@ -129,28 +127,33 @@ class App extends Component {
                   const eventDateEnd = new Date(event.endDate)
                   const isEqualDay = (hourDate.toDateString() === eventDateStart.toDateString()) || 
                                     (hourDate.toDateString() === eventDateEnd.toDateString())
+                  const eventStartHours = eventDateStart.getHours()
+                  const eventEndHours = eventDateEnd.getHours()
                   
                   if (isEqualDay) {
-                    const isEqualHourStart = hourDate.getHours() === eventDateStart.getHours()
+                    const isEqualHourStart = hourDate.getHours() === eventStartHours
                     const isBetweenEventDuration = hourDate > eventDateStart && hourDate < eventDateEnd
 
                     if (isEqualHourStart) {
-                      console.log("UTC DATE: ", new Date(dateByHour).toDateString())
-                      console.log("HOUR DATE: ", new Date(dateByHour).getHours())
-                      console.log("EVENT DATE: ", new Date(eventDateStart).getHours())
-                      console.log(event)
+                      // console.log("UTC DATE: ", new Date(dateByHour).toDateString())
+                      // console.log("HOUR DATE: ", new Date(dateByHour).getHours())
+                      // console.log("EVENT DATE: ", new Date(eventDateStart).getHours())
+                      const eventTimeSpan = eventEndHours - eventStartHours
+                      console.log(eventTimeSpan)
 
-                      hourNode = <div key={hourKey} className={`hour l${event.label}`}>{event.name}</div>
+                      hourNode = (
+                        <div id={hourKey} key={hourKey} className={`hour-wrapper s${eventTimeSpan}`} onClick={() => console.log('click')}>
+                          <div className={`hour scheduled s${eventTimeSpan} l${event.label}`}>
+                            <div className="event-name">{event.name}</div>
+                            <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
+                          </div>
+                        </div>
+                      )
                     }
                     
-                    if (isBetweenEventDuration) {
-                      console.log("UTC DATE: ", new Date(dateByHour).toDateString())
-                      console.log("HOUR DATE: ", new Date(dateByHour).getHours())
-                      console.log("EVENT DATE: ", new Date(eventDateEnd).getHours())
-                      console.log(event)
-
-                      hourNode = <div key={hourKey} className={`hour between l${event.label}`}></div>
-                    }
+                    // if (isBetweenEventDuration) {
+                    //   hourNode = <div key={hourKey} className={`hour between l${event.label}`}></div>
+                    // }
                   }
                 })
 
