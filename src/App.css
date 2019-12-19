@@ -5,22 +5,50 @@
 * {
   box-sizing: border-box;
 }
-/* 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-*/
 
 .header {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid lightgray;
+}
+
+.header .change-week {
+  display: inline-flex;
+  left: 5rem;
+  position: absolute;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  height: 1.1rem;
+}
+
+.header .change-week span {
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.header .change-week .today {
+  padding: 0.25rem 0.75rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  border: 1px solid lightgray;
+}
+
+.header .change-week .today:hover {
+  background-color: lightgray;
+}
+
+.header .change-week span svg {
+  position: relative;
+  top: 1px;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  height: 1.75rem;
+  width: 1.75rem;
+}
+
+.header .change-week span svg:hover {
+  background-color: lightgray;
 }
 
 .week-overview {
@@ -44,6 +72,24 @@
   position: relative;
   width: 14.2%;
   height: 2rem;
+}
+
+.hour-wrapper .current-hour-marker {
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  border-top: 1px solid orangered;
+}
+
+.hour-wrapper .current-hour-marker-pointer {
+  display: block;
+  position: relative;
+  top: -4px;
+  left: -4px;
+  height: 8px;
+  width: 8px;
+  background-color: orangered;
+  border-radius: 4px;
 }
 
 .hour {
@@ -92,12 +138,22 @@
   min-width: 42rem;
 }
 
+.days-axis .hours-axis {
+  width: 3.6rem;
+}
+
 .day-label {
   padding: 0.1rem 0;
   width: 14.2%;
   font-size: 0.75rem;
   color: gray;
   outline: 1px solid white;
+}
+
+.day-label.active {
+  font-weight: 600;
+  color: dodgerblue;
+  border-bottom: 1px solid dodgerblue;
 }
 
 .hour-label {
@@ -125,6 +181,8 @@
 .hour.s3 { height: 5.8rem; }
 .hour.s4 { height: 7.8rem; }
 .hour.s5 { height: 9.8rem; }
+.hour.s6 { height: 11.8rem; }
+.hour.s7 { height: 13.8rem; }
 
 
 /* .hour-wrapper {
