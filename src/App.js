@@ -30,14 +30,25 @@ class App extends Component {
     const selectedDateStart = activeEventDetails.selectedDateStart
     const selectedDateEnd = activeEventDetails.selectedDateEnd
 
+    console.log(activeEventDetails)
+    console.log(selectedDateStart)
+
     const newEvent = {
-      id: '100abc5',
-      name: 'Test yay',
-      startDate: selectedDateStart.toString(),
-      endDate: selectedDateEnd.toString(),
+      id: '100abc7',
+      name: 'Lunch with vedran',
+      startDate: 'Fri Dec 20 2019 13:00:00 GMT+0100 (Central European Standard Time)',
+      endDate: 'Fri Dec 20 2019 14:00:00 GMT+0100 (Central European Standard Time)',
       description: null,
-      label: 3,
+      label: 0,
     };
+    // const newEvent = {
+    //   id: '100abc5',
+    //   name: 'Test yay',
+    //   startDate: selectedDateStart.toString(),
+    //   endDate: selectedDateEnd.toString(),
+    //   description: null,
+    //   label: 3,
+    // };
 
     const updatedEvents = [...this.state.clonedEvents]
     updatedEvents.push(newEvent)
@@ -86,6 +97,7 @@ class App extends Component {
 
     const conditionsPopupTop = topRange
     const conditionsPopupRight = [...Array(72).keys()]
+    let timeSpanLeft = 0
 
     return (
       <div className="App">
@@ -149,6 +161,7 @@ class App extends Component {
                   </div>
                 )
 
+                
                 clonedEvents.forEach((event, eventKey) => {
                   const hourDate = new Date(dateByHour)
                   const eventDateStart = new Date(event.startDate)
@@ -160,30 +173,39 @@ class App extends Component {
                   
                   if (isEqualDay) {
                     const isEqualHourStart = hourDate.getHours() === eventStartHours
-                    // const isBetweenEventDuration = hourDate > eventDateStart && hourDate < eventDateEnd
-
-                    // console.log(isBetweenEventDuration, event)
-
-                    if (isEqualHourStart) {
-                      // console.log("UTC DATE: ", new Date(dateByHour).toDateString())
-                      // console.log("HOUR DATE: ", new Date(dateByHour).getHours())
-                      // console.log("EVENT DATE: ", new Date(eventDateStart).getHours())
+                    const isBetweenEventDuration = hourDate >= eventDateStart && hourDate < eventDateEnd
+                    
+                    if (isBetweenEventDuration) {
                       let eventTimeSpan = eventEndHours - eventStartHours
-                      console.log("eventTimeSpan: ", eventTimeSpan)
+                      
+                      // Event spans into next day
+                      if (eventEndHours < eventStartHours) {
+                        eventTimeSpan = 24 - eventStartHours + eventEndHours
+                      }
+
+                      if (timeSpanLeft === 0) {
+                        timeSpanLeft = eventTimeSpan
+                      }
+                        
+                      const firstSpanClass = timeSpanLeft === eventTimeSpan ? 'between-first' : null
+                      const inBetweenSpanClass = timeSpanLeft > 1 && timeSpanLeft < eventTimeSpan ? 'between' : null
+                      const lastSpanClass = timeSpanLeft === 1 ? 'between-last' : null
                       
                       hourNode = (
                         <div id={hourKey} key={hourKey} className={`hour-wrapper s${eventTimeSpan}`} onClick={() => undefined}>
-                          <div className={`hour scheduled s${eventTimeSpan} l${event.label}`}>
-                            <div className="event-name">{event.name}</div>
-                            <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
+                          <div className={`hour scheduled s${eventTimeSpan} l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass}`}>
+                            { isEqualHourStart && (
+                              <React.Fragment>
+                                <div className="event-name">{event.name}</div>
+                                <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
+                              </React.Fragment>
+                            )}
                           </div>
                         </div>
                       )
+                      
+                      timeSpanLeft -= 1
                     }
-                    
-                    // if (isBetweenEventDuration) {
-                    //   hourNode = <div key={hourKey} className={`hour between l${event.label}`}></div>
-                    // }
                   }
                 })
 

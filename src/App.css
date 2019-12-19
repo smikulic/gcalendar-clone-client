@@ -177,12 +177,22 @@
 .hour.l3 { background-color: #F6BF26; }
 .hour.l10 { background-color: #D50000; }
 
-.hour.s2 { height: 3.8rem; }
+/* .hour.s2 { height: 3.8rem; }
 .hour.s3 { height: 5.8rem; }
 .hour.s4 { height: 7.8rem; }
 .hour.s5 { height: 9.8rem; }
 .hour.s6 { height: 11.8rem; }
 .hour.s7 { height: 13.8rem; }
+.hour.s8 { height: 15.8rem; }
+.hour.s9 { height: 17.8rem; }
+.hour.s10 { height: 19.8rem; }
+.hour.s11 { height: 21.8rem; }
+.hour.s12 { height: 23.8rem; }
+.hour.s13 { height: 25.8rem; }
+.hour.s14 { height: 27.8rem; }
+.hour.s15 { height: 29.8rem; }
+.hour.s16 { height: 31.8rem; } */
+/* .hour.s-17 { height: 33.8rem; } */
 
 
 /* .hour-wrapper {
@@ -211,7 +221,28 @@
 } */
 
 .hour.between {
-  outline: 0;
+  height: 2rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.hour.between-first {
+  height: 2rem;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.hour.between-last {
+  height: 1.9rem;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+
+.hour-wrapper.between:last-child .hour {
+  height: 1.9rem;
 }
 
 .hour.is-active {
