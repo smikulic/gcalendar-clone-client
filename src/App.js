@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaRegClock, FaAlignJustify } from 'react-icons/fa';
 import './App.css';
 import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
 import { getRangeValues } from './getRangeValues';
-// import { transformDbResponse } from './transformDbResponse';
 
 class App extends Component {
   constructor() {
     super()
-
-    // this.handleCreateEvent = this.handleCreateEvent.bind(this);
-    // this.handleSaveEvent = this.handleSaveEvent.bind(this);
-    // this.changeCurrentWeek = this.changeCurrentWeek.bind(this);
 
     this.state = {
       currentDate: new Date(),
@@ -26,29 +21,20 @@ class App extends Component {
   }
 
   handleSaveEvent = (_, id) => {
-    const { activeEventDetails } = this.state;
-    const selectedDateStart = activeEventDetails.selectedDateStart
-    const selectedDateEnd = activeEventDetails.selectedDateEnd
+    const selectedDateStart = new Date(this.refs['event-start-date'].value)
+    const selectedDateEnd = new Date(this.refs['event-end-date'].value)
 
-    console.log(activeEventDetails)
-    console.log(selectedDateStart)
+    selectedDateStart.setHours(this.refs['event-start-time'].value)
+    selectedDateEnd.setHours(this.refs['event-end-time'].value)
 
     const newEvent = {
-      id: '100abc7',
-      name: 'Lunch with vedran',
-      startDate: 'Fri Dec 20 2019 13:00:00 GMT+0100 (Central European Standard Time)',
-      endDate: 'Fri Dec 20 2019 14:00:00 GMT+0100 (Central European Standard Time)',
-      description: null,
+      id: '100abc9',
+      name: this.refs['event-title'].value,
+      startDate: selectedDateStart,
+      endDate: selectedDateEnd,
+      description: this.refs['event-description'].value,
       label: 0,
     };
-    // const newEvent = {
-    //   id: '100abc5',
-    //   name: 'Test yay',
-    //   startDate: selectedDateStart.toString(),
-    //   endDate: selectedDateEnd.toString(),
-    //   description: null,
-    //   label: 3,
-    // };
 
     const updatedEvents = [...this.state.clonedEvents]
     updatedEvents.push(newEvent)
@@ -138,78 +124,104 @@ class App extends Component {
           </div>
           <div className="hours-container">
             { totalHoursByWeek.map((_, hourKey) => {
-                const dateByHour = new Date(currentWeek.weekStart).setHours(hourKey)
-                const isCurrentHourActive = activeEvent === hourKey
-                const currentHourMarker = (currentDate.getDay() - 1) * 24 + currentDate.getHours()
-                const currentMinuteMarker = (currentDate.getMinutes() / 60 * 2).toFixed(1) // Times 2 because of hour wrapper height
+              const thisDate = new Date(currentWeek.weekStart)
+              const dateByHour = thisDate.setHours(hourKey)
+              const dateByHours = thisDate.getHours()
+              const dateByDay = thisDate.getDate()
+              const dateByMonth = thisDate.getMonth() + 1
+              const dateByYear = thisDate.getFullYear()
+              const defaultInputDate = `${dateByYear}-${dateByMonth}-${dateByDay}`
+              const isCurrentHourActive = activeEvent === hourKey
+              const currentHourMarker = (currentDate.getDay() - 1) * 24 + currentDate.getHours()
+              const currentMinuteMarker = (currentDate.getMinutes() / 60 * 2).toFixed(1) // Times 2 because of hour wrapper height
 
-                let hourNode = (
-                  <div id={hourKey} key={hourKey} className="hour-wrapper">
-                    { currentHourMarker === hourKey && (
-                      <div className="current-hour-marker" style={{ top: `${currentMinuteMarker}rem` }}>
-                        <span className="current-hour-marker-pointer"></span>
+              let hourNode = (
+                <div id={hourKey} key={hourKey} className="hour-wrapper">
+                  { currentHourMarker === hourKey && (
+                    <div className="current-hour-marker" style={{ top: `${currentMinuteMarker}rem` }}>
+                      <span className="current-hour-marker-pointer"></span>
+                    </div>
+                  )}
+                  <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}>
+                    { isCurrentHourActive && (
+                      <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
+                        <input type="text" placeholder="Add title" ref="event-title" className="popup-title-input" />
+                        <div className="date-input-group">
+                          <FaRegClock />
+                          <input type="date" ref="event-start-date" defaultValue={defaultInputDate} />
+                          <select ref="event-start-time" defaultValue={dateByHours}>
+                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option> )}
+                          </select>
+                          -
+                          <select ref="event-end-time" defaultValue={dateByHours + 1}>
+                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option> )}
+                          </select>
+                          <input type="date" ref="event-end-date" defaultValue={defaultInputDate} />
+                        </div>
+                        <div className="date-input-group">
+                          <FaAlignJustify />
+                          <input type="text"  ref="event-description" placeholder="Add description" className="popup-description-input" />
+                        </div>
+                        <button
+                          className="popup-submit-button"
+                          onClick={(event) => this.handleSaveEvent(event, hourKey)}
+                        >
+                          Save
+                        </button>
                       </div>
                     )}
-                    <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}>
-                      { isCurrentHourActive && (
-                        <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
-                          <input type="text" />
-                          <button onClick={(event) => this.handleSaveEvent(event, hourKey)}>Save</button>
-                        </div>
-                      )}
-                    </div>
                   </div>
-                )
+                </div>
+              )
 
+              clonedEvents.forEach((event, eventKey) => {
+                const hourDate = new Date(dateByHour)
+                const eventDateStart = new Date(event.startDate)
+                const eventDateEnd = new Date(event.endDate)
+                const isEqualDay = (hourDate.toDateString() === eventDateStart.toDateString()) || 
+                                  (hourDate.toDateString() === eventDateEnd.toDateString())
+                const eventStartHours = eventDateStart.getHours()
+                const eventEndHours = eventDateEnd.getHours()
                 
-                clonedEvents.forEach((event, eventKey) => {
-                  const hourDate = new Date(dateByHour)
-                  const eventDateStart = new Date(event.startDate)
-                  const eventDateEnd = new Date(event.endDate)
-                  const isEqualDay = (hourDate.toDateString() === eventDateStart.toDateString()) || 
-                                    (hourDate.toDateString() === eventDateEnd.toDateString())
-                  const eventStartHours = eventDateStart.getHours()
-                  const eventEndHours = eventDateEnd.getHours()
+                if (isEqualDay) {
+                  const isEqualHourStart = hourDate.getHours() === eventStartHours
+                  const isBetweenEventDuration = hourDate >= eventDateStart && hourDate < eventDateEnd
                   
-                  if (isEqualDay) {
-                    const isEqualHourStart = hourDate.getHours() === eventStartHours
-                    const isBetweenEventDuration = hourDate >= eventDateStart && hourDate < eventDateEnd
+                  if (isBetweenEventDuration) {
+                    let eventTimeSpan = eventEndHours - eventStartHours
                     
-                    if (isBetweenEventDuration) {
-                      let eventTimeSpan = eventEndHours - eventStartHours
-                      
-                      // Event spans into next day
-                      if (eventEndHours < eventStartHours) {
-                        eventTimeSpan = 24 - eventStartHours + eventEndHours
-                      }
-
-                      if (timeSpanLeft === 0) {
-                        timeSpanLeft = eventTimeSpan
-                      }
-                        
-                      const firstSpanClass = timeSpanLeft === eventTimeSpan ? 'between-first' : null
-                      const inBetweenSpanClass = timeSpanLeft > 1 && timeSpanLeft < eventTimeSpan ? 'between' : null
-                      const lastSpanClass = timeSpanLeft === 1 ? 'between-last' : null
-                      
-                      hourNode = (
-                        <div id={hourKey} key={hourKey} className={`hour-wrapper s${eventTimeSpan}`} onClick={() => undefined}>
-                          <div className={`hour scheduled s${eventTimeSpan} l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass}`}>
-                            { isEqualHourStart && (
-                              <React.Fragment>
-                                <div className="event-name">{event.name}</div>
-                                <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
-                              </React.Fragment>
-                            )}
-                          </div>
-                        </div>
-                      )
-                      
-                      timeSpanLeft -= 1
+                    // Event spans into next day
+                    if (eventEndHours < eventStartHours) {
+                      eventTimeSpan = 24 - eventStartHours + eventEndHours
                     }
-                  }
-                })
 
-                return hourNode
+                    if (timeSpanLeft === 0) {
+                      timeSpanLeft = eventTimeSpan
+                    }
+
+                    const firstSpanClass = timeSpanLeft === eventTimeSpan ? 'between-first' : null
+                    const inBetweenSpanClass = timeSpanLeft > 1 && timeSpanLeft < eventTimeSpan ? 'between' : null
+                    const lastSpanClass = timeSpanLeft === 1 ? 'between-last' : null
+                    
+                    hourNode = (
+                      <div id={hourKey} key={hourKey} className={`hour-wrapper s${eventTimeSpan}`} onClick={() => undefined}>
+                        <div className={`hour scheduled s${eventTimeSpan} l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass}`}>
+                          { isEqualHourStart && (
+                            <React.Fragment>
+                              <div className="event-name">{event.name}</div>
+                              <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
+                            </React.Fragment>
+                          )}
+                        </div>
+                      </div>
+                    )
+                    
+                    timeSpanLeft -= 1
+                  }
+                }
+              })
+
+              return hourNode
             })}
           </div>
         </div>
