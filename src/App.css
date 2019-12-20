@@ -95,7 +95,7 @@
 .hour {
   position: absolute;
   padding: 0 0.2rem;
-  width: 90%;
+  width: 92%;
   height: 1.9rem;
   border-radius: 3px;
   text-align: left;
@@ -127,11 +127,11 @@
 }
 
 .create-event-popup.popup-top {
-  top: -6rem;
+  top: -11rem;
 }
 
 .create-event-popup.popup-right {
-  right: -17rem;
+  right: -25rem;
 }
 
 .create-event-popup input,

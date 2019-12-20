@@ -90,7 +90,7 @@ class App extends Component {
 
     return (
       <div className="App">
-        <div className="header">
+        <div className="header" onClick={this.handleClosePopup}>
           <div className="change-week">
             <span className="today" onClick={() => this.changeCurrentWeek('today')}>
               today
