@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { FaChevronLeft, FaChevronRight, FaRegClock, FaAlignJustify } from 'react-icons/fa';
-import './App.css';
+import { FaChevronLeft, FaChevronRight, FaRegClock, FaAlignJustify, FaTimes } from 'react-icons/fa';
 import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
 import { getRangeValues } from './getRangeValues';
+import './App.css';
 
 class App extends Component {
   constructor() {
@@ -13,7 +13,6 @@ class App extends Component {
       currentDate: new Date(),
       currentWeek: getCurrentWeek(new Date()),
       activeEvent: null,
-      activeEventDetails: {},
       clonedEvents: eventsMock,
       totalDaysByWeek: [...Array(7).keys()],
       totalHoursByWeek: [...Array(168).keys()], // 24 hours * 7 days
@@ -29,7 +28,7 @@ class App extends Component {
 
     const newEvent = {
       id: '100abc9',
-      name: this.refs['event-title'].value,
+      name: this.refs['event-title'].value || 'N/A',
       startDate: selectedDateStart,
       endDate: selectedDateEnd,
       description: this.refs['event-description'].value,
@@ -46,6 +45,10 @@ class App extends Component {
 
   handleCreateEvent = (_, id) => {
     this.setState({ activeEvent: id });
+  }
+  
+  handleClosePopup = () => {
+    this.setState({ activeEvent: null });
   }
   
   changeCurrentWeek = (week) => {
@@ -142,9 +145,11 @@ class App extends Component {
                       <span className="current-hour-marker-pointer"></span>
                     </div>
                   )}
-                  <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}>
+                  <React.Fragment>
+                    <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}></div>
                     { isCurrentHourActive && (
                       <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
+                        <FaTimes className="close-button" onClick={this.handleClosePopup} />
                         <input type="text" placeholder="Add title" ref="event-title" className="popup-title-input" />
                         <div className="date-input-group">
                           <FaRegClock />
@@ -170,7 +175,7 @@ class App extends Component {
                         </button>
                       </div>
                     )}
-                  </div>
+                  </React.Fragment>
                 </div>
               )
 

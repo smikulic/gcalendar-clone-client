@@ -116,7 +116,7 @@
 .create-event-popup {
   z-index: 2;
   position: absolute;
-  right: 10rem;
+  right: 11rem;
   padding: 1rem;
   width: 25rem;
   height: 13rem;
@@ -231,6 +231,14 @@
   background: #0e61b9c9;
 }
 
+.create-event-popup .close-button {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  height: 0.85rem;
+  cursor: pointer;
+}
+
 .days-axis {
   display: flex;
   margin: 0.5rem 0 0 0;
@@ -276,49 +284,6 @@
 .hour.l0 { background-color: #0e61b9; }
 .hour.l3 { background-color: #F6BF26; }
 .hour.l10 { background-color: #D50000; }
-
-/* .hour.s2 { height: 3.8rem; }
-.hour.s3 { height: 5.8rem; }
-.hour.s4 { height: 7.8rem; }
-.hour.s5 { height: 9.8rem; }
-.hour.s6 { height: 11.8rem; }
-.hour.s7 { height: 13.8rem; }
-.hour.s8 { height: 15.8rem; }
-.hour.s9 { height: 17.8rem; }
-.hour.s10 { height: 19.8rem; }
-.hour.s11 { height: 21.8rem; }
-.hour.s12 { height: 23.8rem; }
-.hour.s13 { height: 25.8rem; }
-.hour.s14 { height: 27.8rem; }
-.hour.s15 { height: 29.8rem; }
-.hour.s16 { height: 31.8rem; } */
-/* .hour.s-17 { height: 33.8rem; } */
-
-
-/* .hour-wrapper {
-  display: inline-block;
-  width: 14.2%;
-} */
-
-/* .hour.s1 {
-  display: inline-block;
-  width: 50%;
-  float: left;
-}
-
-.hour.s2 {
-  display: inline-block;
-  width: 33.33%;
-  float: left;
-}
-
-.hour-wrapper.s2 {
-  width: 66.66%;
-}
-
-.hour-wrapper.s2 .s1 {
-  width: 50%;
-} */
 
 .hour.between {
   height: 2rem;
