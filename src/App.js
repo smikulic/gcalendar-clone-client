@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { FaChevronLeft, FaChevronRight, FaRegClock, FaAlignJustify, FaTimes } from 'react-icons/fa';
+import { FaRegClock, FaAlignJustify, FaTimes } from 'react-icons/fa';
+import Header from './components/Header';
 import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
 import { getRangeValues } from './getRangeValues';
@@ -90,22 +91,13 @@ class App extends Component {
 
     return (
       <div className="App">
-        <div className="header" onClick={this.handleClosePopup}>
-          <div className="change-week">
-            <span className="today" onClick={() => this.changeCurrentWeek('today')}>
-              today
-            </span>
-            <span onClick={() => this.changeCurrentWeek('previous')}>
-              <FaChevronLeft />
-            </span>
-            <span onClick={() => this.changeCurrentWeek('next')}>
-            <FaChevronRight />
-            </span>
-          </div>
-          {currentWeek.weekStart.toLocaleString('default', { month: 'long' })}
-          {' '}
-          {currentWeek.weekStart.getFullYear()}
-        </div>
+        <Header
+          onClick={this.handleClosePopup}
+          onClickToday={() => this.changeCurrentWeek('today')}
+          onClickPreviousWeek={() => this.changeCurrentWeek('previous')}
+          onClickNextWeek={() => this.changeCurrentWeek('next')}
+          title={`${currentWeek.weekStart.toLocaleString('default', { month: 'long' })} ${currentWeek.weekStart.getFullYear()}`}
+        />
         <div className="days-axis">
           <div className="hours-axis">
             <div className="hour-label">0</div>
@@ -121,9 +113,7 @@ class App extends Component {
         </div>
         <div className="week-overview">
           <div className="hours-axis">
-            { totalHours.map((hour, key) => {
-              return <div key={key} className="hour-label">{hour}</div>
-            })}
+            { totalHours.map((hour, key) => <div key={key} className="hour-label">{hour}</div>) }
           </div>
           <div className="hours-container">
             { totalHoursByWeek.map((_, hourKey) => {
@@ -155,11 +145,11 @@ class App extends Component {
                           <FaRegClock />
                           <input type="date" ref="event-start-date" defaultValue={defaultInputDate} />
                           <select ref="event-start-time" defaultValue={dateByHours}>
-                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option> )}
+                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
                           </select>
                           -
                           <select ref="event-end-time" defaultValue={dateByHours + 1}>
-                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option> )}
+                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
                           </select>
                           <input type="date" ref="event-end-date" defaultValue={defaultInputDate} />
                         </div>

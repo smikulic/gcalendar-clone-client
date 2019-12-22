@@ -1,0 +1,44 @@
+.header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid lightgray;
+}
+
+.header .change-week {
+  display: inline-flex;
+  left: 5rem;
+  position: absolute;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  height: 1.1rem;
+}
+
+.header .change-week span {
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.header .change-week .today {
+  padding: 0.25rem 0.75rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  border: 1px solid lightgray;
+}
+
+.header .change-week .today:hover {
+  background-color: lightgray;
+}
+
+.header .change-week span svg {
+  position: relative;
+  top: 1px;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  height: 1.75rem;
+  width: 1.75rem;
+}
+
+.header .change-week span svg:hover {
+  background-color: lightgray;
+}

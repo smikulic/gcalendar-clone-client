@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 
-.header {
+/* .header {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid lightgray;
 }
@@ -49,7 +49,7 @@
 
 .header .change-week span svg:hover {
   background-color: lightgray;
-}
+} */
 
 .week-overview {
   display: inline-flex;
