@@ -35,7 +35,7 @@ class App extends Component {
     selectedDateEnd.setHours(newEventDetails['event-end-time'])
 
     const newEvent = {
-      id: newEventDetails['event-id'] || null,
+      id: newEventDetails['event-id'] || 'randomIdString',
       name: newEventDetails['event-title'] || 'N/A',
       startDate: selectedDateStart,
       endDate: selectedDateEnd,
@@ -43,8 +43,17 @@ class App extends Component {
       label: 0,
     };
 
-    const updatedEvents = [...clonedEvents]
-    updatedEvents.push(newEvent)
+    let updatedEvents = [...clonedEvents]
+
+    // if event exists edit/update it
+    const foundEvent= clonedEvents.findIndex(event => event.id == newEventDetails['event-id'])
+    if (foundEvent) {
+      clonedEvents[foundEvent] = newEvent
+      updatedEvents = [...clonedEvents]
+    } else {
+      updatedEvents.push(newEvent)
+    }
+
 
     this.setState({
       clonedEvents: updatedEvents,
