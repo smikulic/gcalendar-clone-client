@@ -1,6 +1,4 @@
-import React from 'react';
-
-export function calculateEvent (event, hourNode, dateByHour, timeSpanLeft) {
+export function calculateEvent (event, dateByHour, timeSpanLeft) {
   const hourDate = new Date(dateByHour)
   const eventDateStart = new Date(event.startDate)
   const eventDateEnd = new Date(event.endDate)
@@ -28,24 +26,20 @@ export function calculateEvent (event, hourNode, dateByHour, timeSpanLeft) {
       const firstSpanClass = timeSpanLeft === eventTimeSpan ? 'between-first' : null
       const inBetweenSpanClass = timeSpanLeft > 1 && timeSpanLeft < eventTimeSpan ? 'between' : null
       const lastSpanClass = timeSpanLeft === 1 ? 'between-last' : null
-      
-      hourNode = (
-        <div className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass}`}>
-          { isEqualHourStart && (
-            <React.Fragment>
-              <div className="event-name">{event.name}</div>
-              <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
-            </React.Fragment>
-          )}
-        </div>
-      )
 
       timeSpanLeft -= 1
+
+      return {
+        firstSpanClass,
+        inBetweenSpanClass,
+        lastSpanClass,
+        isEqualHourStart,
+        eventStartHours,
+        eventEndHours,
+        eventTimeLeft: timeSpanLeft,
+      }
     }
   }
 
-  return {
-    eventNode: hourNode,
-    eventTimeLeft: timeSpanLeft,
-  };
+  return false
 }

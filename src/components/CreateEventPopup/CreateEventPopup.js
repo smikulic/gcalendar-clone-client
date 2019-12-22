@@ -6,8 +6,7 @@ import './CreateEventPopup.css';
 
 export default function CreateEventPopup ({
   activeEvent,
-  dateByHours,
-  defaultInputDate,
+  newEventDetails,
   onClosePopup,
   onSaveEvent,
   onInputChange,
@@ -30,7 +29,8 @@ export default function CreateEventPopup ({
         type="text"
         className="popup-title-input"
         placeholder="Add title"
-        autoFocus={true}
+        autoFocus={!newEventDetails['event-title']}
+        value={newEventDetails['event-title']}
         onChange={onInputChange}
       />
       <div className="date-input-group">
@@ -38,19 +38,19 @@ export default function CreateEventPopup ({
         <input
           id="event-start-date"
           type="date"
-          defaultValue={defaultInputDate}
+          defaultValue={newEventDetails['event-start-date']}
           onChange={onInputChange}
         />
         <select
           id="event-start-time"
-          defaultValue={dateByHours}
+          defaultValue={newEventDetails['event-start-time']}
         >
           { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
         </select>
         -
         <select
           id="event-end-time"
-          defaultValue={dateByHours + 1}
+          defaultValue={newEventDetails['event-end-time']}
           onChange={onInputChange}
         >
           { totalHoursEnd.map((hour, key) => <option key={key} value={key + 1}>{hour}</option>) }
@@ -58,7 +58,7 @@ export default function CreateEventPopup ({
         <input
           id="event-end-date"
           type="date"
-          defaultValue={defaultInputDate}
+          defaultValue={newEventDetails['event-end-date']}
           onChange={onInputChange}
         />
       </div>
@@ -69,6 +69,7 @@ export default function CreateEventPopup ({
           type="text"
           className="popup-description-input"
           placeholder="Add description"
+          value={newEventDetails['event-description']}
           onChange={onInputChange}
         />
       </div>

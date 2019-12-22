@@ -6,6 +6,11 @@ import { getCurrentWeek } from './getCurrentWeek';
 import { calculateEvent } from './calculateEvent';
 import './App.css';
 
+// TODO:
+// 1. Add overlapping events (2 during the same time)
+// 2. Edit events feature
+// 3. Drag and drop events
+// 4. Expand events (edit for time end)
 class App extends Component {
   constructor() {
     super()
@@ -30,7 +35,7 @@ class App extends Component {
     selectedDateEnd.setHours(newEventDetails['event-end-time'])
 
     const newEvent = {
-      id: '100abc9',
+      id: newEventDetails['event-id'] || null,
       name: newEventDetails['event-title'] || 'N/A',
       startDate: selectedDateStart,
       endDate: selectedDateEnd,
@@ -43,6 +48,8 @@ class App extends Component {
 
     this.setState({
       clonedEvents: updatedEvents,
+      newEventDetails: {},
+      activeEvent: null,
     })
   }
 
@@ -55,6 +62,31 @@ class App extends Component {
       "event-end-date": defaultInputDate,
       "event-end-time": dateByHours + 1,
     }
+    this.setState({ activeEvent: id, newEventDetails: updatedNewEventDetails });
+  }
+
+  handleEditEvent = (calEvent, id) => {
+    const calEventStartDate = new Date(calEvent.startDate)
+    const calEventEndDate = new Date(calEvent.endDate)
+    const dateStartByDay = calEventStartDate.getDate()
+    const dateStartByMonth = calEventStartDate.getMonth() + 1
+    const dateStartByYear = calEventStartDate.getFullYear()
+    const dateEndByDay = calEventEndDate.getDate()
+    const dateEndByMonth = calEventEndDate.getMonth() + 1
+    const dateEndByYear = calEventEndDate.getFullYear()
+    const eventStartDate = `${dateStartByYear}-${dateStartByMonth}-${dateStartByDay}`
+    const eventEndDate = `${dateEndByYear}-${dateEndByMonth}-${dateEndByDay}`
+
+    const updatedNewEventDetails = {
+      "event-id": calEvent.id,
+      "event-title": calEvent.name,
+      "event-description": calEvent.description,
+      "event-start-date": eventStartDate,
+      "event-start-time": calEventStartDate.getHours(),
+      "event-end-date": eventEndDate,
+      "event-end-time": calEventEndDate.getHours(),
+    }
+
     this.setState({ activeEvent: id, newEventDetails: updatedNewEventDetails });
   }
   
@@ -93,6 +125,7 @@ class App extends Component {
       clonedEvents,
       totalDaysByWeek,
       totalHoursByWeek,
+      newEventDetails,
     } = this.state;
 
     let timeSpanLeft = 0
@@ -144,28 +177,42 @@ class App extends Component {
               const currentHourMarker = currentDay === 0 ? 6 * 24 + currentHours : (currentDay - 1) * 24 + currentHours
 
               let hourNode = (
-                <React.Fragment>
-                  <div
-                    className={ isCurrentHourActive ? 'hour is-active' : `hour` }
-                    onClick={(event) => this.handleCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
-                  />
-                  { isCurrentHourActive && (
-                    <CreateEventPopup
-                      activeEvent={activeEvent}
-                      dateByHours={dateByHours}
-                      defaultInputDate={defaultInputDate}
-                      onClosePopup={this.handleClosePopup}
-                      onSaveEvent={(event) => this.handleSaveEvent(event, hourKey)}
-                      onInputChange={(event) => this.handleInputChange(event)}
-                    />
-                  )}
-                </React.Fragment>
+                <div
+                  className={ isCurrentHourActive ? 'hour is-active' : `hour` }
+                  onClick={(event) => this.handleCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                />
               )
 
               clonedEvents.forEach((event) => {
-                const { eventNode, eventTimeLeft } = calculateEvent(event, hourNode, dateByHour, timeSpanLeft)
-                hourNode = eventNode
-                timeSpanLeft = eventTimeLeft
+                const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
+
+                if (existingEvent) {
+                  const {
+                    firstSpanClass,
+                    inBetweenSpanClass,
+                    lastSpanClass,
+                    isEqualHourStart,
+                    eventStartHours,
+                    eventEndHours,
+                    eventTimeLeft
+                  } = existingEvent
+
+                  hourNode = (
+                    <div
+                      className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass}`}
+                      onClick={() => this.handleEditEvent(event, hourKey)}
+                    >
+                      { isEqualHourStart && (
+                        <React.Fragment>
+                          <div className="event-name">{event.name}</div>
+                          <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
+                        </React.Fragment>
+                      )}
+                    </div>
+                  )
+
+                  timeSpanLeft = eventTimeLeft
+                }
               })
 
               return (
@@ -176,6 +223,15 @@ class App extends Component {
                     </div>
                   )}
                   {hourNode}
+                  { isCurrentHourActive && (
+                    <CreateEventPopup
+                      activeEvent={activeEvent}
+                      newEventDetails={newEventDetails}
+                      onClosePopup={this.handleClosePopup}
+                      onSaveEvent={(event) => this.handleSaveEvent(event, hourKey)}
+                      onInputChange={(event) => this.handleInputChange(event)}
+                    />
+                  )}
                 </div>
               )
             })}
