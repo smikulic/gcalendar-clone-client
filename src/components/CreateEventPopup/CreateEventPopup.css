@@ -1,0 +1,126 @@
+.create-event-popup {
+  z-index: 2;
+  position: relative;
+  right: 25rem;
+  padding: 1rem;
+  width: 24rem;
+  height: 13rem;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px 2px #eee;
+}
+
+.create-event-popup.popup-top {
+  top: -11rem;
+}
+
+.create-event-popup.popup-right {
+  right: -12rem;
+}
+
+.create-event-popup input,
+.create-event-popup select {
+  border: 0;
+  outline: 0;
+  height: 2rem;
+  font-size: 0.65rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+.create-event-popup .date-input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 1rem 0;
+}
+
+.create-event-popup .date-input-group svg {
+  padding: 0.1rem;
+  color: gray;
+}
+
+.create-event-popup .date-input-group input[type=date],
+.create-event-popup .date-input-group select {
+  -webkit-appearance: none;
+  padding: 0 0 0 0.5rem;
+  background: #eee;
+  border-radius: 0;
+  border-bottom: 1px solid transparent;
+  transition: background 0.15s ease-in-out;
+}
+
+.create-event-popup .date-input-group input[type=date] {
+  width: 6.8rem;
+  text-align: right;
+}
+
+.create-event-popup .date-input-group select {
+  width: 2.8rem;
+}
+
+.create-event-popup .date-input-group input[type=date]:hover,
+.create-event-popup .date-input-group select:hover {
+  background: lightgray;
+}
+
+.create-event-popup .date-input-group input[type=date]:focus,
+.create-event-popup .date-input-group select:focus {
+  border-bottom: 1px solid #0e61b9;
+}
+
+.create-event-popup .popup-title-input,
+.create-event-popup .popup-description-input {
+  width: 100%;
+  padding: 0 0.35rem;
+  transition: background 0.15s ease-in-out;
+}
+
+.create-event-popup .popup-title-input {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  border-bottom: 2px solid #0e61b9;
+}
+
+.create-event-popup .popup-description-input {
+  margin-left: 0.4rem;
+  font-size: 0.6rem;
+  border-bottom: 1px solid transparent;
+  background: #eee;
+}
+
+.create-event-popup .popup-description-input:hover {
+  background: lightgray;
+}
+
+.create-event-popup .popup-description-input:focus {
+  border-bottom: 1px solid #0e61b9;
+}
+
+.create-event-popup .popup-submit-button {
+  position: absolute;
+  right: 1rem;
+  height: 2rem;
+  width: 4rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  background: #0e61b9;
+  border-radius: 5px;
+  transition: background 0.15s ease-in-out;
+  outline: 0;
+  cursor: pointer;
+}
+
+.create-event-popup .popup-submit-button:hover {
+  background: #0e61b9c9;
+}
+
+.create-event-popup .close-button {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  height: 0.8rem;
+  cursor: pointer;
+}

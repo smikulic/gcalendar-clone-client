@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { FaRegClock, FaAlignJustify, FaTimes } from 'react-icons/fa';
 import Header from './components/Header';
-import Event from './components/Event';
+import CreateEventPopup from './components/CreateEventPopup';
 import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
-import { getRangeValues } from './getRangeValues';
+import { calculateEvent } from './calculateEvent';
 import './App.css';
 
 class App extends Component {
@@ -18,26 +17,28 @@ class App extends Component {
       clonedEvents: eventsMock,
       totalDaysByWeek: [...Array(7).keys()],
       totalHoursByWeek: [...Array(168).keys()], // 24 hours * 7 days
+      newEventDetails: {},
     }
   }
 
   handleSaveEvent = (_, id) => {
-    const selectedDateStart = new Date(this.refs['event-start-date'].value)
-    const selectedDateEnd = new Date(this.refs['event-end-date'].value)
+    const { newEventDetails, clonedEvents } = this.state
+    const selectedDateStart = new Date(newEventDetails['event-start-date'])
+    const selectedDateEnd = new Date(newEventDetails['event-end-date'])
 
-    selectedDateStart.setHours(this.refs['event-start-time'].value)
-    selectedDateEnd.setHours(this.refs['event-end-time'].value)
+    selectedDateStart.setHours(newEventDetails['event-start-time'])
+    selectedDateEnd.setHours(newEventDetails['event-end-time'])
 
     const newEvent = {
       id: '100abc9',
-      name: this.refs['event-title'].value || 'N/A',
+      name: newEventDetails['event-title'] || 'N/A',
       startDate: selectedDateStart,
       endDate: selectedDateEnd,
-      description: this.refs['event-description'].value,
+      description: newEventDetails['event-description'],
       label: 0,
     };
 
-    const updatedEvents = [...this.state.clonedEvents]
+    const updatedEvents = [...clonedEvents]
     updatedEvents.push(newEvent)
 
     this.setState({
@@ -45,12 +46,27 @@ class App extends Component {
     })
   }
 
-  handleCreateEvent = (_, id) => {
-    this.setState({ activeEvent: id });
+  handleCreateEvent = (_, id, defaultInputDate, dateByHours) => {
+    const updatedNewEventDetails = {
+      "event-title": '',
+      "event-description": '',
+      "event-start-date": defaultInputDate,
+      "event-start-time": dateByHours,
+      "event-end-date": defaultInputDate,
+      "event-end-time": dateByHours + 1,
+    }
+    this.setState({ activeEvent: id, newEventDetails: updatedNewEventDetails });
   }
   
   handleClosePopup = () => {
     this.setState({ activeEvent: null });
+  }
+  
+  handleInputChange = (event) => {
+    let updatedNewEventDetails = { ...this.state.newEventDetails }
+    updatedNewEventDetails[event.target.id] = event.target.value
+
+    this.setState({ newEventDetails: updatedNewEventDetails });
   }
   
   changeCurrentWeek = (week) => {
@@ -79,15 +95,6 @@ class App extends Component {
       totalHoursByWeek,
     } = this.state;
 
-    let topRange = []
-    let startTopRange = 18
-    for(let i = 0; i < 7; i++) {
-      topRange = topRange.concat(getRangeValues(startTopRange, startTopRange+5))
-      startTopRange += 24
-    }
-
-    const conditionsPopupTop = topRange
-    const conditionsPopupRight = [...Array(72).keys()]
     let timeSpanLeft = 0
 
     return (
@@ -131,54 +138,34 @@ class App extends Component {
               const dateByYear = thisDate.getFullYear()
               const defaultInputDate = `${dateByYear}-${dateByMonth}-${dateByDay}`
               const isCurrentHourActive = activeEvent === hourKey
-              const currentHourMarker = (currentDate.getDay() - 1) * 24 + currentDate.getHours()
+              const currentDay = currentDate.getDay()
+              const currentHours = currentDate.getHours()
               const currentMinuteMarker = (currentDate.getMinutes() / 60 * 2).toFixed(1) // Times 2 because of hour wrapper height
+              const currentHourMarker = currentDay === 0 ? 6 * 24 + currentHours : (currentDay - 1) * 24 + currentHours
 
               let hourNode = (
                 <React.Fragment>
-                  <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}></div>
+                  <div
+                    className={ isCurrentHourActive ? 'hour is-active' : `hour` }
+                    onClick={(event) => this.handleCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                  />
                   { isCurrentHourActive && (
-                    <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
-                      <FaTimes className="close-button" onClick={this.handleClosePopup} />
-                      <input type="text" placeholder="Add title" ref="event-title" className="popup-title-input" />
-                      <div className="date-input-group">
-                        <FaRegClock />
-                        <input type="date" ref="event-start-date" defaultValue={defaultInputDate} />
-                        <select ref="event-start-time" defaultValue={dateByHours}>
-                          { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
-                        </select>
-                        -
-                        <select ref="event-end-time" defaultValue={dateByHours + 1}>
-                          { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
-                        </select>
-                        <input type="date" ref="event-end-date" defaultValue={defaultInputDate} />
-                      </div>
-                      <div className="date-input-group">
-                        <FaAlignJustify />
-                        <input type="text"  ref="event-description" placeholder="Add description" className="popup-description-input" />
-                      </div>
-                      <button
-                        className="popup-submit-button"
-                        onClick={(event) => this.handleSaveEvent(event, hourKey)}
-                      >
-                        Save
-                      </button>
-                    </div>
+                    <CreateEventPopup
+                      activeEvent={activeEvent}
+                      dateByHours={dateByHours}
+                      defaultInputDate={defaultInputDate}
+                      onClosePopup={this.handleClosePopup}
+                      onSaveEvent={(event) => this.handleSaveEvent(event, hourKey)}
+                      onInputChange={(event) => this.handleInputChange(event)}
+                    />
                   )}
                 </React.Fragment>
               )
 
               clonedEvents.forEach((event) => {
-                hourNode = (
-                  <Event
-                    key={hourKey}
-                    event={event}
-                    hourKey={hourKey}
-                    hourNode={hourNode}
-                    dateByHour={dateByHour}
-                    timeSpanLeft={timeSpanLeft}
-                  />
-                )
+                const { eventNode, eventTimeLeft } = calculateEvent(event, hourNode, dateByHour, timeSpanLeft)
+                hourNode = eventNode
+                timeSpanLeft = eventTimeLeft
               })
 
               return (
