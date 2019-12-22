@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { FaRegClock, FaAlignJustify, FaTimes } from 'react-icons/fa';
 import Header from './components/Header';
+import Event from './components/Event';
 import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
 import { getRangeValues } from './getRangeValues';
@@ -103,8 +104,13 @@ class App extends Component {
             <div className="hour-label">0</div>
           </div>
           { totalDaysByWeek.map((_, keyDay) => {
+            let isActiveDay = currentDate.getDay() === (keyDay + 1)
+            if (keyDay === 6) { // Sunday
+              isActiveDay = currentDate.getDay() === 0
+            }
+            
             return (
-              <div key={keyDay} className={currentDate.getDay() === (keyDay + 1) ? 'day-label active' : 'day-label'}>
+              <div key={keyDay} className={isActiveDay ? 'day-label active' : 'day-label'}>
                 <div>{currentWeek.weekLabels[keyDay].label}</div>
                 <div>{currentWeek.weekLabels[keyDay].date}</div>
               </div>
@@ -129,94 +135,62 @@ class App extends Component {
               const currentMinuteMarker = (currentDate.getMinutes() / 60 * 2).toFixed(1) // Times 2 because of hour wrapper height
 
               let hourNode = (
+                <React.Fragment>
+                  <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}></div>
+                  { isCurrentHourActive && (
+                    <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
+                      <FaTimes className="close-button" onClick={this.handleClosePopup} />
+                      <input type="text" placeholder="Add title" ref="event-title" className="popup-title-input" />
+                      <div className="date-input-group">
+                        <FaRegClock />
+                        <input type="date" ref="event-start-date" defaultValue={defaultInputDate} />
+                        <select ref="event-start-time" defaultValue={dateByHours}>
+                          { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
+                        </select>
+                        -
+                        <select ref="event-end-time" defaultValue={dateByHours + 1}>
+                          { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
+                        </select>
+                        <input type="date" ref="event-end-date" defaultValue={defaultInputDate} />
+                      </div>
+                      <div className="date-input-group">
+                        <FaAlignJustify />
+                        <input type="text"  ref="event-description" placeholder="Add description" className="popup-description-input" />
+                      </div>
+                      <button
+                        className="popup-submit-button"
+                        onClick={(event) => this.handleSaveEvent(event, hourKey)}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  )}
+                </React.Fragment>
+              )
+
+              clonedEvents.forEach((event) => {
+                hourNode = (
+                  <Event
+                    key={hourKey}
+                    event={event}
+                    hourKey={hourKey}
+                    hourNode={hourNode}
+                    dateByHour={dateByHour}
+                    timeSpanLeft={timeSpanLeft}
+                  />
+                )
+              })
+
+              return (
                 <div id={hourKey} key={hourKey} className="hour-wrapper">
                   { currentHourMarker === hourKey && (
                     <div className="current-hour-marker" style={{ top: `${currentMinuteMarker}rem` }}>
                       <span className="current-hour-marker-pointer"></span>
                     </div>
                   )}
-                  <React.Fragment>
-                    <div className={ isCurrentHourActive ? 'hour is-active' : `hour` } onClick={(event) => this.handleCreateEvent(event, hourKey)}></div>
-                    { isCurrentHourActive && (
-                      <div className={`create-event-popup ${conditionsPopupTop.includes(activeEvent) && 'popup-top'} ${conditionsPopupRight.includes(activeEvent) && 'popup-right'}`}>
-                        <FaTimes className="close-button" onClick={this.handleClosePopup} />
-                        <input type="text" placeholder="Add title" ref="event-title" className="popup-title-input" />
-                        <div className="date-input-group">
-                          <FaRegClock />
-                          <input type="date" ref="event-start-date" defaultValue={defaultInputDate} />
-                          <select ref="event-start-time" defaultValue={dateByHours}>
-                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
-                          </select>
-                          -
-                          <select ref="event-end-time" defaultValue={dateByHours + 1}>
-                            { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
-                          </select>
-                          <input type="date" ref="event-end-date" defaultValue={defaultInputDate} />
-                        </div>
-                        <div className="date-input-group">
-                          <FaAlignJustify />
-                          <input type="text"  ref="event-description" placeholder="Add description" className="popup-description-input" />
-                        </div>
-                        <button
-                          className="popup-submit-button"
-                          onClick={(event) => this.handleSaveEvent(event, hourKey)}
-                        >
-                          Save
-                        </button>
-                      </div>
-                    )}
-                  </React.Fragment>
+                  {hourNode}
                 </div>
               )
-
-              clonedEvents.forEach((event, eventKey) => {
-                const hourDate = new Date(dateByHour)
-                const eventDateStart = new Date(event.startDate)
-                const eventDateEnd = new Date(event.endDate)
-                const isEqualDay = (hourDate.toDateString() === eventDateStart.toDateString()) || 
-                                  (hourDate.toDateString() === eventDateEnd.toDateString())
-                const eventStartHours = eventDateStart.getHours()
-                const eventEndHours = eventDateEnd.getHours()
-                
-                if (isEqualDay) {
-                  const isEqualHourStart = hourDate.getHours() === eventStartHours
-                  const isBetweenEventDuration = hourDate >= eventDateStart && hourDate < eventDateEnd
-                  
-                  if (isBetweenEventDuration) {
-                    let eventTimeSpan = eventEndHours - eventStartHours
-                    
-                    // Event spans into next day
-                    if (eventEndHours < eventStartHours) {
-                      eventTimeSpan = 24 - eventStartHours + eventEndHours
-                    }
-
-                    if (timeSpanLeft === 0) {
-                      timeSpanLeft = eventTimeSpan
-                    }
-
-                    const firstSpanClass = timeSpanLeft === eventTimeSpan ? 'between-first' : null
-                    const inBetweenSpanClass = timeSpanLeft > 1 && timeSpanLeft < eventTimeSpan ? 'between' : null
-                    const lastSpanClass = timeSpanLeft === 1 ? 'between-last' : null
-                    
-                    hourNode = (
-                      <div id={hourKey} key={hourKey} className={`hour-wrapper s${eventTimeSpan}`} onClick={() => undefined}>
-                        <div className={`hour scheduled s${eventTimeSpan} l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass}`}>
-                          { isEqualHourStart && (
-                            <React.Fragment>
-                              <div className="event-name">{event.name}</div>
-                              <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
-                            </React.Fragment>
-                          )}
-                        </div>
-                      </div>
-                    )
-                    
-                    timeSpanLeft -= 1
-                  }
-                }
-              })
-
-              return hourNode
             })}
           </div>
         </div>

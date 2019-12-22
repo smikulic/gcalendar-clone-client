@@ -6,51 +6,6 @@
   box-sizing: border-box;
 }
 
-/* .header {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid lightgray;
-}
-
-.header .change-week {
-  display: inline-flex;
-  left: 5rem;
-  position: absolute;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
-  height: 1.1rem;
-}
-
-.header .change-week span {
-  margin-right: 1rem;
-  cursor: pointer;
-}
-
-.header .change-week .today {
-  padding: 0.25rem 0.75rem;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  text-transform: capitalize;
-  border: 1px solid lightgray;
-}
-
-.header .change-week .today:hover {
-  background-color: lightgray;
-}
-
-.header .change-week span svg {
-  position: relative;
-  top: 1px;
-  border-radius: 1rem;
-  padding: 0.5rem;
-  height: 1.75rem;
-  width: 1.75rem;
-}
-
-.header .change-week span svg:hover {
-  background-color: lightgray;
-} */
-
 .week-overview {
   display: inline-flex;
   padding: 1rem;
@@ -99,18 +54,6 @@
   height: 1.9rem;
   border-radius: 3px;
   text-align: left;
-}
-
-.hour .event-name,
-.hour .event-time {
-  font-size: 0.7rem;
-  font-weight: 300;
-  color: white;
-  -webkit-user-select: none;
-}
-
-.hour .event-name {
-  font-weight: 400;
 }
 
 .create-event-popup {
@@ -275,36 +218,6 @@
 .hour-label:first-child {
   visibility: hidden;
 }
-
-.hour.scheduled {
-  z-index: 1;
-  cursor: pointer;
-}
-
-.hour.l0 { background-color: #0e61b9; }
-.hour.l3 { background-color: #F6BF26; }
-.hour.l10 { background-color: #D50000; }
-
-.hour.between {
-  height: 2rem;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.hour.between-first {
-  height: 2rem;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.hour.between-last {
-  height: 1.9rem;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
 
 .hour-wrapper.between:last-child .hour {
   height: 1.9rem;

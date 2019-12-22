@@ -58,8 +58,8 @@ export const eventsMock = [
   {
     id: '100abc8',
     name: 'Lunch',
-    startDate: 'Fri Dec 20 2019 13:00:00 GMT+0100 (Central European Standard Time)',
-    endDate: 'Fri Dec 20 2019 15:00:00 GMT+0100 (Central European Standard Time)',
+    startDate: 'Sun Dec 22 2019 13:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Sun Dec 22 2019 15:00:00 GMT+0100 (Central European Standard Time)',
     description: null,
     label: 0,
   },
