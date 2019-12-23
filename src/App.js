@@ -4,13 +4,13 @@ import CreateEventPopup from './components/CreateEventPopup';
 import { totalHours, eventsMock } from './mockData';
 import { getCurrentWeek } from './getCurrentWeek';
 import { calculateEvent } from './calculateEvent';
+import { isCurrentDateActive } from './isCurrentDateActive';
 import './App.css';
 
 // TODO:
 // 1. Add overlapping events (2 during the same time)
-// 2. Edit events feature
-// 3. Drag and drop events
-// 4. Expand events (edit for time end)
+// 2. Drag and drop events
+// 3. Expand events (edit for time end)
 class App extends Component {
   constructor() {
     super()
@@ -41,6 +41,8 @@ class App extends Component {
 
     selectedDateStart.setHours(newEventDetails['event-start-time'])
     selectedDateEnd.setHours(newEventDetails['event-end-time'])
+
+    console.log("gg")
 
     const newEvent = {
       id: newEventDetails['event-id'] || 'randomIdString',
@@ -183,6 +185,7 @@ class App extends Component {
 
     let timeSpanLeft = 0
     // console.log("resizeStep: ", resizeStep, resizeElementHeight)
+
     return (
       <div className="App">
         <Header
@@ -197,9 +200,11 @@ class App extends Component {
             <div className="hour-label">0</div>
           </div>
           { totalDaysByWeek.map((_, keyDay) => {
-            let isActiveDay = currentDate.getDay() === (keyDay + 1)
-            if (keyDay === 6) { // Sunday
-              isActiveDay = currentDate.getDay() === 0
+            let isActiveDay = isCurrentDateActive(currentDate)
+            if (isActiveDay) {
+              isActiveDay = keyDay === 6 ?
+                            currentDate.getDay() === 0 : // Sunday
+                            currentDate.getDay() === (keyDay + 1) // Other days
             }
             
             return (
@@ -238,7 +243,7 @@ class App extends Component {
 
               clonedEvents.forEach((event) => {
                 const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
-
+                
                 if (existingEvent) {
                   const {
                     firstSpanClass,
@@ -247,13 +252,14 @@ class App extends Component {
                     isEqualHourStart,
                     eventStartHours,
                     eventEndHours,
-                    eventTimeLeft
+                    eventTimeLeft,
+                    isExpired,
                   } = existingEvent
 
                   hourNode = (
                     <div
                       ref={hourKey}
-                      className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass}`}
+                      className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
                       // style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
                     >
                       { isEqualHourStart && (
@@ -279,7 +285,7 @@ class App extends Component {
 
               return (
                 <div key={hourKey} className="hour-wrapper">
-                  { currentHourMarker === hourKey && (
+                  { currentHourMarker === hourKey && isCurrentDateActive(currentDate) && (
                     <div className="current-hour-marker" style={{ top: `${currentMinuteMarker}rem` }}>
                       <span className="current-hour-marker-pointer"></span>
                     </div>

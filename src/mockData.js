@@ -63,6 +63,22 @@ export const eventsMock = [
     description: null,
     label: 0,
   },
+  {
+    id: '100abc9',
+    name: 'Lunch',
+    startDate: 'Mon Dec 23 2019 13:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Mon Dec 23 2019 15:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 0,
+  },
+  {
+    id: '100abc10',
+    name: 'Dinner',
+    startDate: 'Mon Dec 23 2019 22:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Mon Dec 23 2019 23:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 0,
+  },
   // {
   //   id: '100abc5',
   //   name: 'Learn JS',

@@ -4,14 +4,15 @@ export function calculateEvent (event, dateByHour, timeSpanLeft) {
   const eventDateEnd = new Date(event.endDate)
   const isEqualDay = (hourDate.toDateString() === eventDateStart.toDateString()) || 
                     (hourDate.toDateString() === eventDateEnd.toDateString())
-  const eventStartHours = eventDateStart.getHours()
-  const eventEndHours = eventDateEnd.getHours()
   
   if (isEqualDay) {
-    const isEqualHourStart = hourDate.getHours() === eventStartHours
     const isBetweenEventDuration = hourDate >= eventDateStart && hourDate < eventDateEnd
     
     if (isBetweenEventDuration) {
+      const actualDate = new Date()
+      const eventStartHours = eventDateStart.getHours()
+      const eventEndHours = eventDateEnd.getHours()
+      const isEqualHourStart = hourDate.getHours() === eventStartHours
       let eventTimeSpan = eventEndHours - eventStartHours
       
       // Event spans into next day
@@ -37,6 +38,7 @@ export function calculateEvent (event, dateByHour, timeSpanLeft) {
         eventStartHours,
         eventEndHours,
         eventTimeLeft: timeSpanLeft,
+        isExpired: eventDateEnd < actualDate,
       }
     }
   }
