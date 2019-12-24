@@ -44,6 +44,7 @@ export default function CreateEventPopup ({
         <select
           id="event-start-time"
           defaultValue={newEventDetails['event-start-time']}
+          onChange={onInputChange}
         >
           { totalHours.map((hour, key) => <option key={key} value={key}>{hour}</option>) }
         </select>

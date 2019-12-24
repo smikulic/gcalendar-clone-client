@@ -42,13 +42,11 @@ class App extends Component {
     selectedDateStart.setHours(newEventDetails['event-start-time'])
     selectedDateEnd.setHours(newEventDetails['event-end-time'])
 
-    console.log("gg")
-
     const newEvent = {
       id: newEventDetails['event-id'] || 'randomIdString',
       name: newEventDetails['event-title'] || 'N/A',
-      startDate: selectedDateStart,
-      endDate: selectedDateEnd,
+      startDate: selectedDateStart.toString(),
+      endDate: selectedDateEnd.toString(),
       description: newEventDetails['event-description'],
       label: 0,
     };
@@ -57,7 +55,7 @@ class App extends Component {
 
     // if event exists edit/update it
     const foundEvent= clonedEvents.findIndex(event => event.id === newEventDetails['event-id'])
-    if (foundEvent) {
+    if (foundEvent > 0) {
       clonedEvents[foundEvent] = newEvent
       updatedEvents = [...clonedEvents]
     } else {
@@ -119,6 +117,8 @@ class App extends Component {
   handleInputChange = (event) => {
     let updatedNewEventDetails = { ...this.state.newEventDetails }
     updatedNewEventDetails[event.target.id] = event.target.value
+
+    console.log(updatedNewEventDetails)
 
     this.setState({ newEventDetails: updatedNewEventDetails });
   }
