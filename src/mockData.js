@@ -79,6 +79,14 @@ export const eventsMock = [
     description: null,
     label: 0,
   },
+  {
+    id: '100abc11',
+    name: 'Conference JS Berlin',
+    startDate: 'Thu Dec 26 2019 10:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Sat Dec 28 2019 20:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 3,
+  },
   // {
   //   id: '100abc5',
   //   name: 'Learn JS',

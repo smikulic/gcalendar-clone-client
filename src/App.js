@@ -118,8 +118,6 @@ class App extends Component {
     let updatedNewEventDetails = { ...this.state.newEventDetails }
     updatedNewEventDetails[event.target.id] = event.target.value
 
-    console.log(updatedNewEventDetails)
-
     this.setState({ newEventDetails: updatedNewEventDetails });
   }
   
@@ -260,6 +258,7 @@ class App extends Component {
                     <div
                       ref={hourKey}
                       className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
+                      onClick={() => this.handleEditEvent(event, hourKey)}
                       // style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
                     >
                       { isEqualHourStart && (
