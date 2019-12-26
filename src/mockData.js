@@ -87,22 +87,22 @@ export const eventsMock = [
     description: null,
     label: 3,
   },
-  // {
-  //   id: '100abc5',
-  //   name: 'Learn JS',
-  //   startDate: 'Fri Dec 13 2019 18:00:00 GMT+0100 (Central European Standard Time)',
-  //   endDate: 'Fri Dec 13 2019 20:00:00 GMT+0100 (Central European Standard Time)',
-  //   description: 'Refresh knowledge on React Hooks',
-  //   label: 0,
-  // },
-  // {
-  //   id: '100abc6',
-  //   name: 'Dinner',
-  //   startDate: 'Fri Dec 13 2019 18:00:00 GMT+0100 (Central European Standard Time)',
-  //   endDate: 'Fri Dec 13 2019 19:00:00 GMT+0100 (Central European Standard Time)',
-  //   description: '',
-  //   label: 0,
-  // },
+  {
+    id: '100abc12',
+    name: 'Call landlord',
+    startDate: 'Sun Dec 29 2019 10:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Sun Dec 29 2019 11:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 0,
+  },
+  {
+    id: '100abc13',
+    name: 'Brunch',
+    startDate: 'Sun Dec 29 2019 10:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Sun Dec 29 2019 11:00:00 GMT+0100 (Central European Standard Time)',
+    description: null,
+    label: 3,
+  },
 ];
 export const totalHours = ['0:00','1:00','2:00','3:00','4:00','5:00','6:00','7:00','8:00','9:00','10:00','11:00','12:00',
                           '13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
