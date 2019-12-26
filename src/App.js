@@ -32,6 +32,7 @@ class App extends Component {
         x: 0,
         y: 0,
       },
+      sidebarActive: true,
     }
   }
 
@@ -168,6 +169,11 @@ class App extends Component {
     this.setState({ resizeStart: event.clientY, currentResizeElement: refKey, resizeElementHeight: this.refs[refKey].clientHeight })
   }
 
+  onClickSidebarToggle = () => {
+    console.log('aha', !this.state.sidebarActive)
+    this.setState({ sidebarActive: !this.state.sidebarActive })
+  }
+
   render() {
     const {
       activeEvent,
@@ -177,6 +183,7 @@ class App extends Component {
       totalDaysByWeek,
       totalHoursByWeek,
       newEventDetails,
+      sidebarActive,
       resizeStart,
       resizeStep,
       resizeElementHeight,
@@ -194,16 +201,21 @@ class App extends Component {
           onClickPreviousWeek={() => this.changeCurrentWeek('previous')}
           onClickNextWeek={() => this.changeCurrentWeek('next')}
           title={`${currentWeek.weekStart.toLocaleString('default', { month: 'long' })} ${currentWeek.weekStart.getFullYear()}`}
+          onClickSidebarToggle={this.onClickSidebarToggle}
         />
+
+        {sidebarActive && (
         <div className="sidebar">
-          <div>create</div>
-          <div>calendar</div>
-          <div>my calendars</div>
+          <div>"sidebar"</div>
+          <div></div>
+          <div></div>
         </div>
 
-        <div className="main-overview">
+        )}
 
-          <div className="days-axis">
+        <div className={`main-overview ${sidebarActive ? '' : 'open-full-width'}`}>
+
+          <div className={`days-axis ${sidebarActive ? '' : 'open-full-width'}`}>
             <div className="hours-axis">
               <div className="hour-label">0</div>
             </div>
