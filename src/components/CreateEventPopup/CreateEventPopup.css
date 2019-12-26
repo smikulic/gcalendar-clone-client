@@ -117,7 +117,8 @@
   border-bottom: 1px solid #0e61b9;
 }
 
-.create-event-popup .popup-submit-button {
+.create-event-popup .popup-submit-button,
+ .create-event-popup .popup-more-options-button {
   position: absolute;
   right: 1rem;
   bottom: 1rem;
@@ -127,6 +128,7 @@
   font-weight: 500;
   color: white;
   background: #0e61b9;
+  border: 1px solid transparent;
   border-radius: 5px;
   transition: background 0.15s ease-in-out;
   outline: 0;
@@ -138,9 +140,19 @@
     bottom: 0.6rem;
   }
 }
-
 .create-event-popup .popup-submit-button:hover {
   background: #0e61b9c9;
+}
+
+.create-event-popup .popup-more-options-button {
+  right: 5.4rem;
+  width: 6rem;
+  background: white;
+  color: gray;
+}
+.create-event-popup .popup-more-options-button:hover {
+  background: #eee;
+  cursor: not-allowed; /* remove after feature is done */
 }
 
 .create-event-popup .close-button {

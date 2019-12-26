@@ -11,6 +11,7 @@ export default function Header ({
 }) {
   return (
     <div className="header" onClick={onClick}>
+      <div className="title">Calendar</div>
       <div className="change-week">
         <span className="today" onClick={onClickToday}>
           today

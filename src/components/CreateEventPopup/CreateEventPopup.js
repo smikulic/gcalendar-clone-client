@@ -75,6 +75,12 @@ export default function CreateEventPopup ({
         />
       </div>
       <button
+        className="popup-more-options-button"
+        // onClick={onMoreOptions}
+      >
+        More options
+      </button>
+      <button
         className="popup-submit-button"
         onClick={onSaveEvent}
       >

@@ -9,6 +9,7 @@ import './App.css';
 
 // TODO:
 // 1. Add overlapping events (2 during the same time)
+// 2. Fixed height calendar scroll
 // 2. Drag and drop events
 // 3. Expand events (edit for time end)
 class App extends Component {
@@ -194,116 +195,127 @@ class App extends Component {
           onClickNextWeek={() => this.changeCurrentWeek('next')}
           title={`${currentWeek.weekStart.toLocaleString('default', { month: 'long' })} ${currentWeek.weekStart.getFullYear()}`}
         />
-        <div className="days-axis">
-          <div className="hours-axis">
-            <div className="hour-label">0</div>
-          </div>
-          { totalDaysByWeek.map((_, keyDay) => {
-            let isActiveDay = isCurrentDateActive(currentDate)
-            if (isActiveDay) {
-              isActiveDay = keyDay === 6 ?
-                            currentDate.getDay() === 0 : // Sunday
-                            currentDate.getDay() === (keyDay + 1) // Other days
-            }
-            
-            return (
-              <div key={keyDay} className={isActiveDay ? 'day-label active' : 'day-label'}>
-                <div>{currentWeek.weekLabels[keyDay].label}</div>
-                <div>{currentWeek.weekLabels[keyDay].date}</div>
-              </div>
-            )
-          })}
+        <div className="sidebar">
+          <div>create</div>
+          <div>calendar</div>
+          <div>my calendars</div>
         </div>
-        <div className="week-overview" onMouseMove={resizeStart ? this.handleMouseMove : undefined}>
-          <div className="hours-axis">
-            { totalHours.map((hour, key) => <div key={key} className="hour-label">{hour}</div>) }
-          </div>
-          <div className="hours-container">
-            { totalHoursByWeek.map((_, hourKey) => {
-              const thisDate = new Date(currentWeek.weekStart)
-              const dateByHour = thisDate.setHours(hourKey)
-              const dateByHours = thisDate.getHours()
-              const dateByDay = thisDate.getDate()
-              const dateByMonth = thisDate.getMonth() + 1
-              const dateByYear = thisDate.getFullYear()
-              const defaultInputDate = `${dateByYear}-${dateByMonth}-${dateByDay}`
-              const isCurrentHourActive = activeEvent === hourKey
-              const currentDay = currentDate.getDay()
-              const currentHours = currentDate.getHours()
-              const currentMinuteMarker = (currentDate.getMinutes() / 60 * 2).toFixed(1) // Times 2 because of hour wrapper height
-              const currentHourMarker = currentDay === 0 ? 6 * 24 + currentHours : (currentDay - 1) * 24 + currentHours
 
-              let hourNode = (
-                <div
-                  className={ isCurrentHourActive ? 'hour is-active' : `hour` }
-                  onClick={(event) => this.handleCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
-                />
-              )
+        <div className="main-overview">
 
-              clonedEvents.forEach((event) => {
-                const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
-                
-                if (existingEvent) {
-                  const {
-                    firstSpanClass,
-                    inBetweenSpanClass,
-                    lastSpanClass,
-                    isEqualHourStart,
-                    eventStartHours,
-                    eventEndHours,
-                    eventTimeLeft,
-                    isExpired,
-                  } = existingEvent
-
-                  hourNode = (
-                    <div
-                      ref={hourKey}
-                      className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
-                      onClick={() => this.handleEditEvent(event, hourKey)}
-                      // style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
-                    >
-                      { isEqualHourStart && firstSpanClass && (
-                        <div onClick={() => this.handleEditEvent(event, hourKey)}>
-                          <div className="event-name">{event.name}</div>
-                          <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
-                        </div>
-                      )}
-                      {/* {lastSpanClass && (
-                        <div
-                          className="resize outline"
-                          onMouseDown={(event) => this.handleOnResize(event, hourKey)}
-                          onMouseUp={(event) => this.handleEditEvent(event, hourKey)}
-                          style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
-                        />
-                      )} */}
-                    </div>
-                  )
-
-                  timeSpanLeft = eventTimeLeft
-                }
-              })
-
+          <div className="days-axis">
+            <div className="hours-axis">
+              <div className="hour-label">0</div>
+            </div>
+            { totalDaysByWeek.map((_, keyDay) => {
+              let isActiveDay = isCurrentDateActive(currentDate)
+              if (isActiveDay) {
+                isActiveDay = keyDay === 6 ?
+                              currentDate.getDay() === 0 : // Sunday
+                              currentDate.getDay() === (keyDay + 1) // Other days
+              }
+              
               return (
-                <div key={hourKey} className="hour-wrapper">
-                  { currentHourMarker === hourKey && isCurrentDateActive(currentDate) && (
-                    <div className="current-hour-marker" style={{ top: `${currentMinuteMarker}rem` }}>
-                      <span className="current-hour-marker-pointer"></span>
-                    </div>
-                  )}
-                  {hourNode}
-                  { isCurrentHourActive && (
-                    <CreateEventPopup
-                      activeEvent={activeEvent}
-                      newEventDetails={newEventDetails}
-                      onClosePopup={this.handleClosePopup}
-                      onSaveEvent={(event) => this.handleSaveEvent(event, hourKey)}
-                      onInputChange={(event) => this.handleInputChange(event)}
-                    />
-                  )}
+                <div key={keyDay} className={isActiveDay ? 'day-label active' : 'day-label'}>
+                  <div>{currentWeek.weekLabels[keyDay].label}</div>
+                  <div>{currentWeek.weekLabels[keyDay].date}</div>
                 </div>
               )
             })}
           </div>
+
+          <div className="week-overview" onMouseMove={resizeStart ? this.handleMouseMove : undefined}>
+            <div className="hours-axis">
+              { totalHours.map((hour, key) => <div key={key} className="hour-label">{hour}</div>) }
+            </div>
+            <div className="hours-container">
+              { totalHoursByWeek.map((_, hourKey) => {
+                const thisDate = new Date(currentWeek.weekStart)
+                const dateByHour = thisDate.setHours(hourKey)
+                const dateByHours = thisDate.getHours()
+                const dateByDay = thisDate.getDate()
+                const dateByMonth = thisDate.getMonth() + 1
+                const dateByYear = thisDate.getFullYear()
+                const defaultInputDate = `${dateByYear}-${dateByMonth}-${dateByDay}`
+                const isCurrentHourActive = activeEvent === hourKey
+                const currentDay = currentDate.getDay()
+                const currentHours = currentDate.getHours()
+                const currentMinuteMarker = (currentDate.getMinutes() / 60 * 2).toFixed(1) // Times 2 because of hour wrapper height
+                const currentHourMarker = currentDay === 0 ? 6 * 24 + currentHours : (currentDay - 1) * 24 + currentHours
+
+                let hourNode = (
+                  <div
+                    className={ isCurrentHourActive ? 'hour is-active' : `hour` }
+                    onClick={(event) => this.handleCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                  />
+                )
+
+                clonedEvents.forEach((event) => {
+                  const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
+                  
+                  if (existingEvent) {
+                    const {
+                      firstSpanClass,
+                      inBetweenSpanClass,
+                      lastSpanClass,
+                      isEqualHourStart,
+                      eventStartHours,
+                      eventEndHours,
+                      eventTimeLeft,
+                      isExpired,
+                    } = existingEvent
+
+                    hourNode = (
+                      <div
+                        ref={hourKey}
+                        className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
+                        onClick={() => this.handleEditEvent(event, hourKey)}
+                        // style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
+                      >
+                        { isEqualHourStart && firstSpanClass && (
+                          <div onClick={() => this.handleEditEvent(event, hourKey)}>
+                            <div className="event-name">{event.name}</div>
+                            <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
+                          </div>
+                        )}
+                        {/* {lastSpanClass && (
+                          <div
+                            className="resize outline"
+                            onMouseDown={(event) => this.handleOnResize(event, hourKey)}
+                            onMouseUp={(event) => this.handleEditEvent(event, hourKey)}
+                            style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
+                          />
+                        )} */}
+                      </div>
+                    )
+
+                    timeSpanLeft = eventTimeLeft
+                  }
+                })
+
+                return (
+                  <div key={hourKey} className="hour-wrapper">
+                    { currentHourMarker === hourKey && isCurrentDateActive(currentDate) && (
+                      <div className="current-hour-marker" style={{ top: `${currentMinuteMarker}rem` }}>
+                        <span className="current-hour-marker-pointer"></span>
+                      </div>
+                    )}
+                    {hourNode}
+                    { isCurrentHourActive && (
+                      <CreateEventPopup
+                        activeEvent={activeEvent}
+                        newEventDetails={newEventDetails}
+                        onClosePopup={this.handleClosePopup}
+                        onSaveEvent={(event) => this.handleSaveEvent(event, hourKey)}
+                        onInputChange={(event) => this.handleInputChange(event)}
+                      />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
         </div>
       </div>
     );
