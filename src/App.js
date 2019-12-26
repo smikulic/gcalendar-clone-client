@@ -48,7 +48,7 @@ class App extends Component {
       startDate: selectedDateStart.toString(),
       endDate: selectedDateEnd.toString(),
       description: newEventDetails['event-description'],
-      label: 0,
+      label: newEventDetails['event-label'],
     };
 
     let updatedEvents = [...clonedEvents]
@@ -99,6 +99,7 @@ class App extends Component {
 
     const updatedNewEventDetails = {
       "event-id": calEvent.id,
+      "event-label": calEvent.label,
       "event-title": calEvent.name,
       "event-description": calEvent.description,
       "event-start-date": eventStartDate,
@@ -261,7 +262,7 @@ class App extends Component {
                       onClick={() => this.handleEditEvent(event, hourKey)}
                       // style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
                     >
-                      { isEqualHourStart && (
+                      { isEqualHourStart && firstSpanClass && (
                         <div onClick={() => this.handleEditEvent(event, hourKey)}>
                           <div className="event-name">{event.name}</div>
                           <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>

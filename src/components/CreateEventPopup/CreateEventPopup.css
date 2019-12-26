@@ -1,7 +1,7 @@
 .create-event-popup {
-  z-index: 2;
+  z-index: 3;
   position: relative;
-  right: 25rem;
+  right: 24.5rem;
   padding: 1rem;
   width: 24rem;
   height: 13rem;
@@ -10,13 +10,27 @@
   border-radius: 5px;
   box-shadow: 0px 0px 10px 2px #eee;
 }
+@media(max-width: 1180px) {
+  .create-event-popup {
+    padding: 0.6rem;
+    width: 23rem;
+    height: 12rem;
+    right: 23.5rem;
+  }
+}
 
 .create-event-popup.popup-top {
   top: -11rem;
 }
 
 .create-event-popup.popup-right {
-  right: -12rem;
+  position: absolute;
+  right: -24.5rem;
+}
+@media(max-width: 1180px) {
+  .create-event-popup.popup-right {
+    right: -23.5rem;
+  }
 }
 
 .create-event-popup input,
@@ -34,6 +48,11 @@
   justify-content: space-between;
   align-items: center;
   margin: 0 0 1rem 0;
+}
+@media(max-width: 1180px) {
+  .create-event-popup .date-input-group {
+    margin: 0 0 0.6rem 0;
+  }
 }
 
 .create-event-popup .date-input-group svg {
@@ -101,6 +120,7 @@
 .create-event-popup .popup-submit-button {
   position: absolute;
   right: 1rem;
+  bottom: 1rem;
   height: 2rem;
   width: 4rem;
   font-size: 0.75rem;
@@ -111,6 +131,12 @@
   transition: background 0.15s ease-in-out;
   outline: 0;
   cursor: pointer;
+}
+@media(max-width: 1180px) {
+  .create-event-popup .popup-submit-button {
+    right: 0.6rem;
+    bottom: 0.6rem;
+  }
 }
 
 .create-event-popup .popup-submit-button:hover {
