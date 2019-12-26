@@ -26,14 +26,6 @@ class App extends Component {
       totalDaysByWeek: [...Array(7).keys()],
       totalHoursByWeek: [...Array(168).keys()], // 24 hours * 7 days
       newEventDetails: {},
-      currentResizeElement: null,
-      resizeElementHeight: null,
-      resizeStart: 0,
-      resizeStep: 0,
-      mousePosition: {
-        x: 0,
-        y: 0,
-      },
       sidebarActive: true,
     }
   }
@@ -66,14 +58,10 @@ class App extends Component {
       updatedEvents.push(newEvent)
     }
 
-
     this.setState({
       clonedEvents: updatedEvents,
       newEventDetails: {},
       activeEvent: null,
-      currentResizeElement: null,
-      resizeStep: 0,
-      resizeStart: 0,
     })
   }
 
@@ -142,33 +130,9 @@ class App extends Component {
     })
   }
 
-  handleMouseMove = event => {
-    const distanceBetween = this.state.mousePosition.y - this.state.resizeStart
-
-    if (distanceBetween > 40 && distanceBetween < 80) {
-      this.setState({
-        mousePosition: { x: event.clientX, y: event.clientY },
-        // resizeElementHeight: this.state.resizeElementHeight * 2,
-        resizeStep: 2,
-      })
-    } else if (distanceBetween > 80 && distanceBetween < 120) {
-      this.setState({
-        mousePosition: { x: event.clientX, y: event.clientY },
-        // resizeElementHeight: this.state.resizeElementHeight * 3,
-        resizeStep: 3,
-      })
-    } else {
-      this.setState({
-        mousePosition: { x: event.clientX, y: event.clientY },
-      })
-    }
-  }
-
   handleOnResize = (event, refKey) => {
-    console.log("HAHA")
     console.log(event.clientY)
     console.log(this.refs[refKey].clientHeight)
-    this.setState({ resizeStart: event.clientY, currentResizeElement: refKey, resizeElementHeight: this.refs[refKey].clientHeight })
   }
 
   onClickSidebarToggle = () => {
@@ -185,14 +149,9 @@ class App extends Component {
       totalHoursByWeek,
       newEventDetails,
       sidebarActive,
-      resizeStart,
-      resizeStep,
-      resizeElementHeight,
-      currentResizeElement,
     } = this.state;
 
     let timeSpanLeft = 0
-    // console.log("resizeStep: ", resizeStep, resizeElementHeight)
 
     return (
       <div className="App">
@@ -229,7 +188,7 @@ class App extends Component {
             })}
           </div>
 
-          <div className="week-overview" onMouseMove={resizeStart ? this.handleMouseMove : undefined}>
+          <div className="week-overview">
             <div className="hours-axis">
               { totalHours.map((hour, key) => <div key={key} className="hour-label">{hour}</div>) }
             </div>
@@ -255,7 +214,6 @@ class App extends Component {
                   />
                 )
 
-                let eventStack = []
                 clonedEvents.forEach((event) => {
                   const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
                   
@@ -271,61 +229,26 @@ class App extends Component {
                       isExpired,
                     } = existingEvent
 
-                    let updatedEvent = {
-                      ...event,
-                      eventStartHours,
-                      eventEndHours,
-                    }
-                    eventStack.push(updatedEvent)
-
-                    // if multiple events in one time slot
-                    if (eventStack.length > 1) {
-                      hourNode = (
-                        <div>
-                          {eventStack.map((stackedEvent, eventKey) => {
-                            return (
-                              <div
-                                ref={hourKey}
-                                key={eventKey}
-                                className={`hour scheduled l${stackedEvent.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'} s${eventStack.length}`}
-                                onClick={() => this.handleEditEvent(stackedEvent, hourKey)}
-                              >
-                                { isEqualHourStart && firstSpanClass && (
-                                  <div onClick={() => this.handleEditEvent(stackedEvent, hourKey)}>
-                                    <div className="event-name">{stackedEvent.name}</div>
-                                    <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>
-                                  </div>
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )
-                    } else {
-                      hourNode = (
-                        <div
-                          ref={hourKey}
-                          className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
-                          onClick={() => this.handleEditEvent(event, hourKey)}
-                          // style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
-                        >
-                          { isEqualHourStart && firstSpanClass && (
-                            <div onClick={() => this.handleEditEvent(event, hourKey)}>
-                              <div className="event-name">{event.name}</div>
-                              <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
-                            </div>
-                          )}
-                          {/* {lastSpanClass && (
-                            <div
-                              className="resize outline"
-                              onMouseDown={(event) => this.handleOnResize(event, hourKey)}
-                              onMouseUp={(event) => this.handleEditEvent(event, hourKey)}
-                              style={{ height: resizeStep > 1 && currentResizeElement === hourKey ? resizeElementHeight * resizeStep : 'inherit' }}
-                            />
-                          )} */}
-                        </div>
-                      )
-                    }
+                    hourNode = (
+                      <div
+                        ref={hourKey}
+                        className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
+                        onClick={() => this.handleEditEvent(event, hourKey)}
+                      >
+                        { isEqualHourStart && firstSpanClass && (
+                          <div onClick={() => this.handleEditEvent(event, hourKey)}>
+                            <div className="event-name">{event.name}</div>
+                            <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
+                          </div>
+                        )}
+                        {lastSpanClass && (
+                          <div
+                            className="resize"
+                            onMouseDown={(event) => this.handleOnResize(event, hourKey)}
+                          />
+                        )}
+                      </div>
+                    )
 
                     timeSpanLeft = eventTimeLeft
                   }
