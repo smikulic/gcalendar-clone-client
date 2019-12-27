@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaRegClock, FaAlignJustify, FaTimes } from 'react-icons/fa';
 import { totalHours, totalHoursEnd } from '../../mockData';
-import { getRangeValues } from '../../getRangeValues';
+import { getRangeValues } from '../../utils/getRangeValues';
 import './CreateEventPopup.css';
 
 export default function CreateEventPopup ({
@@ -29,6 +29,7 @@ export default function CreateEventPopup ({
         type="text"
         className="popup-title-input"
         placeholder="Add title"
+        autoComplete="off"
         autoFocus={!newEventDetails['event-title']}
         value={newEventDetails['event-title']}
         onChange={onInputChange}

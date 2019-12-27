@@ -3,9 +3,10 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import CreateEventPopup from './components/CreateEventPopup';
 import { totalHours, eventsMock } from './mockData';
-import { getCurrentWeek } from './getCurrentWeek';
-import { calculateEvent } from './calculateEvent';
-import { isCurrentDateActive } from './isCurrentDateActive';
+import { getUniqueId } from './utils/getUniqueId';
+import { calculateEvent } from './utils/calculateEvent';
+import { createOrEditEvent } from './utils/createOrEditEvent';
+import { isCurrentDateActive, getFormattedDate, setPreviousWeek, getCurrentWeek } from './utils/dateUtils';
 import './App.css';
 
 // TODO:
@@ -30,16 +31,18 @@ class App extends Component {
     }
   }
 
-  handleSaveEvent = (_, id) => {
+  handleClosePopup = () => this.setState({ activeEvent: null })
+  onClickSidebarToggle = () => this.setState({ sidebarActive: !this.state.sidebarActive })
+
+  handleSaveEvent = () => {
     const { newEventDetails, clonedEvents } = this.state
     const selectedDateStart = new Date(newEventDetails['event-start-date'])
     const selectedDateEnd = new Date(newEventDetails['event-end-date'])
-
     selectedDateStart.setHours(newEventDetails['event-start-time'])
     selectedDateEnd.setHours(newEventDetails['event-end-time'])
 
     const newEvent = {
-      id: newEventDetails['event-id'] || 'randomIdString',
+      id: newEventDetails['event-id'] || getUniqueId(),
       name: newEventDetails['event-title'] || 'N/A',
       startDate: selectedDateStart.toString(),
       endDate: selectedDateEnd.toString(),
@@ -47,26 +50,12 @@ class App extends Component {
       label: newEventDetails['event-label'] || 0,
     };
 
-    let updatedEvents = [...clonedEvents]
-
-    // if event exists edit/update it
-    const foundEvent= clonedEvents.findIndex(event => event.id === newEventDetails['event-id'])
-    if (foundEvent > 0) {
-      clonedEvents[foundEvent] = newEvent
-      updatedEvents = [...clonedEvents]
-    } else {
-      updatedEvents.push(newEvent)
-    }
-
-    this.setState({
-      clonedEvents: updatedEvents,
-      newEventDetails: {},
-      activeEvent: null,
-    })
+    let updatedEvents = createOrEditEvent(newEventDetails['event-id'], newEvent, clonedEvents)
+    this.setState({ clonedEvents: updatedEvents, newEventDetails: {}, activeEvent: null })
   }
 
-  handleCreateEvent = (_, id, defaultInputDate, dateByHours) => {
-    const updatedNewEventDetails = {
+  handleOnCreateEvent = (_, id, defaultInputDate, dateByHours) => {
+    const defaultEventDetails = {
       "event-title": '',
       "event-description": '',
       "event-start-date": defaultInputDate,
@@ -74,20 +63,14 @@ class App extends Component {
       "event-end-date": defaultInputDate,
       "event-end-time": dateByHours + 1,
     }
-    this.setState({ activeEvent: id, newEventDetails: updatedNewEventDetails });
+    this.setState({ activeEvent: id, newEventDetails: defaultEventDetails })
   }
 
-  handleEditEvent = (calEvent, id) => {
+  handleOnEditEvent = (calEvent, id) => {
     const calEventStartDate = new Date(calEvent.startDate)
     const calEventEndDate = new Date(calEvent.endDate)
-    const dateStartByDay = calEventStartDate.getDate()
-    const dateStartByMonth = calEventStartDate.getMonth() + 1
-    const dateStartByYear = calEventStartDate.getFullYear()
-    const dateEndByDay = calEventEndDate.getDate()
-    const dateEndByMonth = calEventEndDate.getMonth() + 1
-    const dateEndByYear = calEventEndDate.getFullYear()
-    const eventStartDate = `${dateStartByYear}-${dateStartByMonth}-${dateStartByDay}`
-    const eventEndDate = `${dateEndByYear}-${dateEndByMonth}-${dateEndByDay}`
+    const eventStartDate = getFormattedDate(calEventStartDate)
+    const eventEndDate = getFormattedDate(calEventEndDate)
 
     const updatedNewEventDetails = {
       "event-id": calEvent.id,
@@ -103,40 +86,20 @@ class App extends Component {
     this.setState({ activeEvent: id, newEventDetails: updatedNewEventDetails });
   }
   
-  handleClosePopup = () => {
-    this.setState({ activeEvent: null });
-  }
-  
   handleInputChange = (event) => {
     let updatedNewEventDetails = { ...this.state.newEventDetails }
     updatedNewEventDetails[event.target.id] = event.target.value
-
     this.setState({ newEventDetails: updatedNewEventDetails });
   }
   
   changeCurrentWeek = (week) => {
-    let previousWeekDate = this.state.currentDate
-    
-    if (week === 'today') {
-      previousWeekDate = new Date()
-    } else {
-      const offset = week === 'previous' ? -7 : 7
-      previousWeekDate.setDate(previousWeekDate.getDate() + offset)
-    }
-
-    this.setState({
-      currentDate: previousWeekDate,
-      currentWeek: getCurrentWeek(previousWeekDate),
-    })
+    const previousWeekDate = setPreviousWeek(week, this.state.currentDate)
+    this.setState({ currentDate: previousWeekDate, currentWeek: getCurrentWeek(previousWeekDate) })
   }
 
   handleOnResize = (event, refKey) => {
     console.log(event.clientY)
     console.log(this.refs[refKey].clientHeight)
-  }
-
-  onClickSidebarToggle = () => {
-    this.setState({ sidebarActive: !this.state.sidebarActive })
   }
 
   render() {
@@ -197,10 +160,8 @@ class App extends Component {
                 const thisDate = new Date(currentWeek.weekStart)
                 const dateByHour = thisDate.setHours(hourKey)
                 const dateByHours = thisDate.getHours()
-                const dateByDay = thisDate.getDate()
-                const dateByMonth = thisDate.getMonth() + 1
-                const dateByYear = thisDate.getFullYear()
-                const defaultInputDate = `${dateByYear}-${dateByMonth}-${dateByDay}`
+                const defaultInputDate = getFormattedDate(thisDate)
+
                 const isCurrentHourActive = activeEvent === hourKey
                 const currentDay = currentDate.getDay()
                 const currentHours = currentDate.getHours()
@@ -210,7 +171,7 @@ class App extends Component {
                 let hourNode = (
                   <div
                     className={ isCurrentHourActive ? 'hour is-active' : `hour` }
-                    onClick={(event) => this.handleCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                    onClick={(event) => this.handleOnCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
                   />
                 )
 
@@ -233,10 +194,10 @@ class App extends Component {
                       <div
                         ref={hourKey}
                         className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
-                        onClick={() => this.handleEditEvent(event, hourKey)}
+                        onClick={() => this.handleOnEditEvent(event, hourKey)}
                       >
                         { isEqualHourStart && firstSpanClass && (
-                          <div onClick={() => this.handleEditEvent(event, hourKey)}>
+                          <div onClick={() => this.handleOnEditEvent(event, hourKey)}>
                             <div className="event-name">{event.name}</div>
                             <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
                           </div>
@@ -267,7 +228,7 @@ class App extends Component {
                         activeEvent={activeEvent}
                         newEventDetails={newEventDetails}
                         onClosePopup={this.handleClosePopup}
-                        onSaveEvent={(event) => this.handleSaveEvent(event, hourKey)}
+                        onSaveEvent={this.handleSaveEvent}
                         onInputChange={(event) => this.handleInputChange(event)}
                       />
                     )}
