@@ -2,6 +2,7 @@ export function calculateEvent (event, dateByHour, timeSpanLeft) {
   const hourDate = new Date(dateByHour)
   const eventDateStart = new Date(event.startDate)
   const eventDateEnd = new Date(event.endDate)
+  const startEndDiff = Math.abs(eventDateEnd - eventDateStart) / 3600000
   const isBetweenEventDuration = hourDate >= eventDateStart && hourDate < eventDateEnd
   
   if (isBetweenEventDuration) {
@@ -42,6 +43,7 @@ export function calculateEvent (event, dateByHour, timeSpanLeft) {
       isEqualHourStart,
       eventStartHours,
       eventEndHours,
+      startEndDiff,
       eventTimeLeft: timeSpanLeft,
       isExpired: eventDateEnd < actualDate,
     }

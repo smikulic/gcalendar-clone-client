@@ -27,7 +27,7 @@ class App extends Component {
       totalDaysByWeek: [...Array(7).keys()],
       totalHoursByWeek: [...Array(168).keys()], // 24 hours * 7 days
       newEventDetails: {},
-      sidebarActive: true,
+      sidebarActive: false,
     }
   }
 
@@ -175,6 +175,7 @@ class App extends Component {
                   />
                 )
 
+                let multipleEventStack = []
                 clonedEvents.forEach((event) => {
                   const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
                   
@@ -188,32 +189,66 @@ class App extends Component {
                       eventEndHours,
                       eventTimeLeft,
                       isExpired,
+                      startEndDiff,
                     } = existingEvent
 
-                    hourNode = (
-                      <div
-                        ref={hourKey}
-                        className={`hour scheduled l${event.label} ${firstSpanClass} ${inBetweenSpanClass} ${lastSpanClass} ${isExpired && 'expired'}`}
-                        onClick={() => this.handleOnEditEvent(event, hourKey)}
-                      >
-                        { isEqualHourStart && firstSpanClass && (
-                          <div onClick={() => this.handleOnEditEvent(event, hourKey)}>
-                            <div className="event-name">{event.name}</div>
-                            <div className="event-time">{eventStartHours}:00 - {eventEndHours}:00</div>
-                          </div>
-                        )}
-                        {lastSpanClass && (
-                          <div
-                            className="resize"
-                            onMouseDown={(event) => this.handleOnResize(event, hourKey)}
-                          />
-                        )}
-                      </div>
-                    )
+                    let updatedEvent = {
+                      ...event,
+                      isEqualHourStart,
+                      eventStartHours,
+                      eventEndHours,
+                      firstSpanClass,
+                      inBetweenSpanClass,
+                      lastSpanClass,
+                      isExpired,
+                      startEndDiff,
+                    }
 
+                    multipleEventStack.push(updatedEvent)
                     timeSpanLeft = eventTimeLeft
                   }
                 })
+
+                const multipleEventStackLength = multipleEventStack.length 
+                console.log(multipleEventStackLength)
+
+                hourNode = (
+                  <React.Fragment>
+                    {multipleEventStack.map((stackedEvent, eventKey) => {
+                      console.log("stackedEvent: ", stackedEvent, eventKey)
+                      
+                      let eventStyle = { width: '92%', marginLeft: '0' }
+
+                      if (multipleEventStackLength === 2) {
+                        switch(eventKey) {
+                          case 1:
+                            eventStyle = { width: '50%', marginLeft: '42%' }
+                            break
+                          default:
+                            eventStyle = eventStyle
+                        }
+                      }
+                      
+
+                      return (
+                        <div
+                          ref={hourKey}
+                          key={eventKey}
+                          style={eventStyle}
+                          className={`hour scheduled l${stackedEvent.label} ${stackedEvent.firstSpanClass} ${stackedEvent.inBetweenSpanClass} ${stackedEvent.lastSpanClass} ${stackedEvent.isExpired && 'expired'}`}
+                          onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}
+                        >
+                          { stackedEvent.isEqualHourStart && stackedEvent.firstSpanClass && (
+                            <div onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}>
+                              <div className="event-name">{stackedEvent.name}</div>
+                              <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </React.Fragment>
+                )
 
                 return (
                   <div key={hourKey} className="hour-wrapper">

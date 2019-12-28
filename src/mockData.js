@@ -91,7 +91,7 @@ export const eventsMock = [
     id: '100abc12',
     name: 'Call landlord',
     startDate: 'Sun Dec 29 2019 10:00:00 GMT+0100 (Central European Standard Time)',
-    endDate: 'Sun Dec 29 2019 11:00:00 GMT+0100 (Central European Standard Time)',
+    endDate: 'Sun Dec 29 2019 12:00:00 GMT+0100 (Central European Standard Time)',
     description: null,
     label: 0,
   },
