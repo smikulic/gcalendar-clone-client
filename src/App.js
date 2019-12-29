@@ -213,60 +213,62 @@ class App extends Component {
 
                 const multipleEventStackLength = multipleEventStack.length 
               
-                if (multipleEventStackLength > 1) {
-                  multipleEventStack = multipleEventStack.map((stackedEvent, eventKey) => {
-                    let eventStyle = { width: '92%', marginLeft: '0' }
+                if (multipleEventStackLength > 0) {
+                  if (multipleEventStackLength > 1) {
+                    multipleEventStack = multipleEventStack.map((stackedEvent, eventKey) => {
+                      let eventStyle = { width: '92%', marginLeft: '0' }
 
-                    if (multipleEventStackLength === 2) {
-                      switch(eventKey) {
-                        case 1:
-                          eventStyle = { width: '48%', marginLeft: '48%' }
-                          break
-                        default:
-                          eventStyle = { width: '48%', marginLeft: '0' }
+                      if (multipleEventStackLength === 2) {
+                        switch(eventKey) {
+                          case 1:
+                            eventStyle = { width: '48%', marginLeft: '48%' }
+                            break
+                          default:
+                            eventStyle = { width: '48%', marginLeft: '0' }
+                        }
                       }
-                    }
 
-                    usedEvents = {
-                      ...usedEvents,
-                      [stackedEvent.id]: eventStyle,
-                    }
+                      usedEvents = {
+                        ...usedEvents,
+                        [stackedEvent.id]: eventStyle,
+                      }
 
-                    return {
-                      ...stackedEvent,
-                      eventStyle,
-                    }
-                  })
+                      return {
+                        ...stackedEvent,
+                        eventStyle,
+                      }
+                    })
+                  }
+                  
+                  hourNode = (
+                    <React.Fragment>
+                      {multipleEventStack.map((stackedEvent, eventKey) => {
+                        let eventStyle = stackedEvent.eventStyle
+
+                        if (usedEvents[stackedEvent.id]) {
+                          eventStyle = usedEvents[stackedEvent.id]
+                        }
+
+                        return (
+                          <div
+                            ref={hourKey}
+                            key={eventKey}
+                            style={eventStyle}
+                            className={`hour scheduled l${stackedEvent.label} ${stackedEvent.firstSpanClass} ${stackedEvent.inBetweenSpanClass} ${stackedEvent.lastSpanClass} ${stackedEvent.isExpired && 'expired'}`}
+                            onClick={(event) => multipleEventStackLength > 0 ? this.handleOnEditEvent(stackedEvent, hourKey) : this.handleOnCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                          >
+                            { stackedEvent.isEqualHourStart && stackedEvent.firstSpanClass && (
+                              <div onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}>
+                                <div className="event-name">{stackedEvent.name}</div>
+                                <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </React.Fragment>
+                  )
                 }
-
-                hourNode = (
-                  <React.Fragment>
-                    {multipleEventStack.map((stackedEvent, eventKey) => {
-                      let eventStyle = stackedEvent.eventStyle
-
-                      if (usedEvents[stackedEvent.id]) {
-                        eventStyle = usedEvents[stackedEvent.id]
-                      }
-
-                      return (
-                        <div
-                          ref={hourKey}
-                          key={eventKey}
-                          style={eventStyle}
-                          className={`hour scheduled l${stackedEvent.label} ${stackedEvent.firstSpanClass} ${stackedEvent.inBetweenSpanClass} ${stackedEvent.lastSpanClass} ${stackedEvent.isExpired && 'expired'}`}
-                          onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}
-                        >
-                          { stackedEvent.isEqualHourStart && stackedEvent.firstSpanClass && (
-                            <div onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}>
-                              <div className="event-name">{stackedEvent.name}</div>
-                              <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </React.Fragment>
-                )
 
                 return (
                   <div key={hourKey} className="hour-wrapper">
