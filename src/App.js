@@ -115,6 +115,7 @@ class App extends Component {
     } = this.state;
 
     let timeSpanLeft = 0
+    let usedEvents = {}
 
     return (
       <div className="App">
@@ -202,6 +203,7 @@ class App extends Component {
                       lastSpanClass,
                       isExpired,
                       startEndDiff,
+                      eventTimeLeft,
                     }
 
                     multipleEventStack.push(updatedEvent)
@@ -210,25 +212,41 @@ class App extends Component {
                 })
 
                 const multipleEventStackLength = multipleEventStack.length 
-                console.log(multipleEventStackLength)
+              
+                if (multipleEventStackLength > 1) {
+                  multipleEventStack = multipleEventStack.map((stackedEvent, eventKey) => {
+                    let eventStyle = { width: '92%', marginLeft: '0' }
+
+                    if (multipleEventStackLength === 2) {
+                      switch(eventKey) {
+                        case 1:
+                          eventStyle = { width: '48%', marginLeft: '48%' }
+                          break
+                        default:
+                          eventStyle = { width: '48%', marginLeft: '0' }
+                      }
+                    }
+
+                    usedEvents = {
+                      ...usedEvents,
+                      [stackedEvent.id]: eventStyle,
+                    }
+
+                    return {
+                      ...stackedEvent,
+                      eventStyle,
+                    }
+                  })
+                }
 
                 hourNode = (
                   <React.Fragment>
                     {multipleEventStack.map((stackedEvent, eventKey) => {
-                      console.log("stackedEvent: ", stackedEvent, eventKey)
-                      
-                      let eventStyle = { width: '92%', marginLeft: '0' }
+                      let eventStyle = stackedEvent.eventStyle
 
-                      if (multipleEventStackLength === 2) {
-                        switch(eventKey) {
-                          case 1:
-                            eventStyle = { width: '50%', marginLeft: '42%' }
-                            break
-                          default:
-                            eventStyle = eventStyle
-                        }
+                      if (usedEvents[stackedEvent.id]) {
+                        eventStyle = usedEvents[stackedEvent.id]
                       }
-                      
 
                       return (
                         <div
