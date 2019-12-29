@@ -127,27 +127,23 @@ class App extends Component {
       const eventTimeSlots = [...Array(startEndDiff).keys()]
       let eventClass = 'between-first'
       let eventStyle = { width: '92%', marginLeft: '0' }
-      
 
       let enrichedEvent = {
         ...event,
         startEndDiff,
         eventClass,
+        eventStyle,
       }
 
       if (eventStartDay === -1) {
         eventStartDay = 6
       }
-      
-
-
-      // console.log(eventStartDay, eventStartHours, startEndDiff)
-      // console.log(event, startEndDiff, eventStartHours, eventTimeSlots, enrichedEvents)
 
       // Go through all the time slots appointed to that event
       const totalTimeSlotsPerEvent = eventTimeSlots.length
       eventTimeSlots.forEach((timeSlot) => {
         const timeSlotActualHourIndex = eventStartDay * 24 + eventStartHours + timeSlot
+        const currentEventPerTimeSlot = enrichedEvents[timeSlotActualHourIndex]
 
         if (totalTimeSlotsPerEvent === 1) { // if only 1 event then it's rounded edges on both ends
           eventClass = 'between-first between-last' 
@@ -165,23 +161,18 @@ class App extends Component {
         let multipleTimeSlotEvents = [enrichedEvent]
 
         // If there are multiple events for one time slot
-        if (enrichedEvents[timeSlotActualHourIndex]) {
-          multipleTimeSlotEvents = multipleTimeSlotEvents.concat(enrichedEvents[timeSlotActualHourIndex])
+        if (currentEventPerTimeSlot) {
+          multipleTimeSlotEvents = multipleTimeSlotEvents.concat(currentEventPerTimeSlot)
           multipleTimeSlotEvents.sort((a, b) => b.startEndDiff - a.startEndDiff)
-          
-          multipleTimeSlotEvents.forEach((timeSlotEvent) => {
-            console.log(timeSlotEvent, multipleTimeSlotEvents.length)
-          })
         }
-
         
         enrichedEvents = {
           ...enrichedEvents,
-          [timeSlotActualHourIndex]: multipleTimeSlotEvents
+          [timeSlotActualHourIndex]: multipleTimeSlotEvents,
         }
-        // console.log(timeSlotActualHourIndex, multipleTimeSlotEvents, enrichedEvents)
       })
     })
+
 
     console.log(enrichedEvents)
 
