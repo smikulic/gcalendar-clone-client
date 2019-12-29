@@ -288,7 +288,7 @@ class App extends Component {
                             className={`hour scheduled l${stackedEvent.label} ${stackedEvent.eventClass} ${stackedEvent.isExpired && 'expired'}`}
                             onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}
                           >
-                            { (
+                            {stackedEvent.eventClass.includes('between-first') && (
                               <div onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}>
                                 <div className="event-name">{stackedEvent.name}</div>
                                 <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>

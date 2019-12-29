@@ -93,7 +93,7 @@ export const eventsMock = [
     startDate: 'Mon Dec 23 2019 22:00:00 GMT+0100 (Central European Standard Time)',
     endDate: 'Mon Dec 23 2019 23:00:00 GMT+0100 (Central European Standard Time)',
     description: null,
-    label: 0,
+    label: 3,
   },
   {
     id: '100abc10x2',
@@ -101,7 +101,7 @@ export const eventsMock = [
     startDate: 'Mon Dec 23 2019 22:00:00 GMT+0100 (Central European Standard Time)',
     endDate: 'Mon Dec 23 2019 24:00:00 GMT+0100 (Central European Standard Time)',
     description: null,
-    label: 0,
+    label: 10,
   },
   {
     id: '100abc11',
