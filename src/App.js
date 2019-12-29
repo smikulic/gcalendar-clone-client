@@ -117,6 +117,7 @@ class App extends Component {
     let timeSpanLeft = 0
     let usedEvents = {}
     let enrichedEvents = {}
+    let enrichedEventsSameTimeSlot = {}
 
     clonedEvents.forEach((event) => {
       const eventDateStart = new Date(event.startDate)
@@ -124,15 +125,18 @@ class App extends Component {
       const startEndDiff = Math.abs(eventDateEnd - eventDateStart) / 3600000
       let eventStartDay = eventDateStart.getDay() - 1
       const eventStartHours = eventDateStart.getHours()
+      const eventEndHours = eventDateEnd.getHours()
       const eventTimeSlots = [...Array(startEndDiff).keys()]
       let eventClass = 'between-first'
-      let eventStyle = { width: '92%', marginLeft: '0' }
+      let eventStyle = { width: '92%' }
 
       let enrichedEvent = {
         ...event,
-        startEndDiff,
-        eventClass,
         eventStyle,
+        eventClass,
+        startEndDiff,
+        eventEndHours,
+        eventStartHours,
       }
 
       if (eventStartDay === -1) {
@@ -164,6 +168,19 @@ class App extends Component {
         if (currentEventPerTimeSlot) {
           multipleTimeSlotEvents = multipleTimeSlotEvents.concat(currentEventPerTimeSlot)
           multipleTimeSlotEvents.sort((a, b) => b.startEndDiff - a.startEndDiff)
+
+          multipleTimeSlotEvents.forEach((multipleTimeSlotEvent, multipleTimeSlotEventsKey) => {
+            let maxLength = multipleTimeSlotEvents.length
+            
+            if (enrichedEventsSameTimeSlot[multipleTimeSlotEvent.id] > maxLength) {
+              maxLength = enrichedEventsSameTimeSlot[multipleTimeSlotEvent.id]
+            }
+
+            enrichedEventsSameTimeSlot = {
+              ...enrichedEventsSameTimeSlot,
+              [multipleTimeSlotEvent.id]: maxLength,
+            }
+          })
         }
         
         enrichedEvents = {
@@ -173,6 +190,24 @@ class App extends Component {
       })
     })
 
+    const clonedEnrichedEvents = {...enrichedEvents }
+    Object.entries(clonedEnrichedEvents).forEach(([enrichedEventKey, enrichedEvent]) => {
+      let updatedEnrichedEvent = []
+
+      enrichedEvent.forEach(enrichedEventTimeSlot => {
+        let updatedEnrichedEventTimeSlot = { ...enrichedEventTimeSlot }
+
+        if (enrichedEventsSameTimeSlot[enrichedEventTimeSlot.id]) {
+          updatedEnrichedEventTimeSlot = {
+            ...updatedEnrichedEventTimeSlot,
+            eventStyle: { width: `${92 / enrichedEventsSameTimeSlot[enrichedEventTimeSlot.id]}%` }
+          }
+        }
+        updatedEnrichedEvent.push(updatedEnrichedEventTimeSlot)
+      })
+
+      enrichedEvents[enrichedEventKey] = updatedEnrichedEvent
+    })
 
     console.log(enrichedEvents)
 
@@ -235,73 +270,10 @@ class App extends Component {
                   />
                 )
 
-                let multipleEventStack = []
-                clonedEvents.forEach((event) => {
-                  const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
-                  
-                  if (existingEvent) {
-                    const {
-                      firstSpanClass,
-                      inBetweenSpanClass,
-                      lastSpanClass,
-                      isEqualHourStart,
-                      eventStartHours,
-                      eventEndHours,
-                      eventTimeLeft,
-                      isExpired,
-                      startEndDiff,
-                    } = existingEvent
-
-                    let updatedEvent = {
-                      ...event,
-                      isEqualHourStart,
-                      eventStartHours,
-                      eventEndHours,
-                      firstSpanClass,
-                      inBetweenSpanClass,
-                      lastSpanClass,
-                      isExpired,
-                      startEndDiff,
-                      eventTimeLeft,
-                    }
-
-                    multipleEventStack.push(updatedEvent)
-                    timeSpanLeft = eventTimeLeft
-                  }
-                })
-
-                const multipleEventStackLength = multipleEventStack.length 
-              
-                if (multipleEventStackLength > 0) {
-                  if (multipleEventStackLength > 1) {
-                    multipleEventStack = multipleEventStack.map((stackedEvent, eventKey) => {
-                      let eventStyle = { width: '92%', marginLeft: '0' }
-
-                      if (multipleEventStackLength === 2) {
-                        switch(eventKey) {
-                          case 1:
-                            eventStyle = { width: '48%', marginLeft: '48%' }
-                            break
-                          default:
-                            eventStyle = { width: '48%', marginLeft: '0' }
-                        }
-                      }
-
-                      usedEvents = {
-                        ...usedEvents,
-                        [stackedEvent.id]: eventStyle,
-                      }
-
-                      return {
-                        ...stackedEvent,
-                        eventStyle,
-                      }
-                    })
-                  }
-                  
+                if (enrichedEvents[hourKey]) {
                   hourNode = (
                     <React.Fragment>
-                      {multipleEventStack.map((stackedEvent, eventKey) => {
+                      {enrichedEvents[hourKey].map((stackedEvent, eventKey) => {
                         let eventStyle = stackedEvent.eventStyle
 
                         if (usedEvents[stackedEvent.id]) {
@@ -313,10 +285,10 @@ class App extends Component {
                             ref={hourKey}
                             key={eventKey}
                             style={eventStyle}
-                            className={`hour scheduled l${stackedEvent.label} ${stackedEvent.firstSpanClass} ${stackedEvent.inBetweenSpanClass} ${stackedEvent.lastSpanClass} ${stackedEvent.isExpired && 'expired'}`}
-                            onClick={(event) => multipleEventStackLength > 0 ? this.handleOnEditEvent(stackedEvent, hourKey) : this.handleOnCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                            className={`hour scheduled l${stackedEvent.label} ${stackedEvent.eventClass} ${stackedEvent.isExpired && 'expired'}`}
+                            onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}
                           >
-                            { stackedEvent.isEqualHourStart && stackedEvent.firstSpanClass && (
+                            { (
                               <div onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}>
                                 <div className="event-name">{stackedEvent.name}</div>
                                 <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>
@@ -328,6 +300,100 @@ class App extends Component {
                     </React.Fragment>
                   )
                 }
+
+                // let multipleEventStack = []
+                // clonedEvents.forEach((event) => {
+                //   const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
+                  
+                //   if (existingEvent) {
+                //     const {
+                //       firstSpanClass,
+                //       inBetweenSpanClass,
+                //       lastSpanClass,
+                //       isEqualHourStart,
+                //       eventStartHours,
+                //       eventEndHours,
+                //       eventTimeLeft,
+                //       isExpired,
+                //       startEndDiff,
+                //     } = existingEvent
+
+                //     let updatedEvent = {
+                //       ...event,
+                //       isEqualHourStart,
+                //       eventStartHours,
+                //       eventEndHours,
+                //       firstSpanClass,
+                //       inBetweenSpanClass,
+                //       lastSpanClass,
+                //       isExpired,
+                //       startEndDiff,
+                //       eventTimeLeft,
+                //     }
+
+                //     multipleEventStack.push(updatedEvent)
+                //     timeSpanLeft = eventTimeLeft
+                //   }
+                // })
+
+                // const multipleEventStackLength = multipleEventStack.length 
+              
+                // if (multipleEventStackLength > 0) {
+                //   if (multipleEventStackLength > 1) {
+                //     multipleEventStack = multipleEventStack.map((stackedEvent, eventKey) => {
+                //       let eventStyle = { width: '92%', marginLeft: '0' }
+
+                //       if (multipleEventStackLength === 2) {
+                //         switch(eventKey) {
+                //           case 1:
+                //             eventStyle = { width: '48%', marginLeft: '48%' }
+                //             break
+                //           default:
+                //             eventStyle = { width: '48%', marginLeft: '0' }
+                //         }
+                //       }
+
+                //       usedEvents = {
+                //         ...usedEvents,
+                //         [stackedEvent.id]: eventStyle,
+                //       }
+
+                //       return {
+                //         ...stackedEvent,
+                //         eventStyle,
+                //       }
+                //     })
+                //   }
+                  
+                //   hourNode = (
+                //     <React.Fragment>
+                //       {multipleEventStack.map((stackedEvent, eventKey) => {
+                //         let eventStyle = stackedEvent.eventStyle
+
+                //         if (usedEvents[stackedEvent.id]) {
+                //           eventStyle = usedEvents[stackedEvent.id]
+                //         }
+
+                //         return (
+                //           <div
+                //             ref={hourKey}
+                //             key={eventKey}
+                //             style={eventStyle}
+                //             className={`hour scheduled l${stackedEvent.label} ${stackedEvent.firstSpanClass} ${stackedEvent.inBetweenSpanClass} ${stackedEvent.lastSpanClass} ${stackedEvent.isExpired && 'expired'}`}
+                //             onClick={(event) => multipleEventStackLength > 0 ? this.handleOnEditEvent(stackedEvent, hourKey) : this.handleOnCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                //           >
+                //             { stackedEvent.isEqualHourStart && stackedEvent.firstSpanClass && (
+                //               <div onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}>
+                //                 <div className="event-name">{stackedEvent.name}</div>
+                //                 <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>
+                //               </div>
+                //             )}
+                //           </div>
+                //         )
+                //       })}
+                //     </React.Fragment>
+                //   )
+                // }
 
                 return (
                   <div key={hourKey} id={hourKey} className="hour-wrapper">
