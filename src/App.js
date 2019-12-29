@@ -116,6 +116,74 @@ class App extends Component {
 
     let timeSpanLeft = 0
     let usedEvents = {}
+    let enrichedEvents = {}
+
+    clonedEvents.forEach((event) => {
+      const eventDateStart = new Date(event.startDate)
+      const eventDateEnd = new Date(event.endDate)
+      const startEndDiff = Math.abs(eventDateEnd - eventDateStart) / 3600000
+      let eventStartDay = eventDateStart.getDay() - 1
+      const eventStartHours = eventDateStart.getHours()
+      const eventTimeSlots = [...Array(startEndDiff).keys()]
+      let eventClass = 'between-first'
+      let eventStyle = { width: '92%', marginLeft: '0' }
+      
+
+      let enrichedEvent = {
+        ...event,
+        startEndDiff,
+        eventClass,
+      }
+
+      if (eventStartDay === -1) {
+        eventStartDay = 6
+      }
+      
+
+
+      // console.log(eventStartDay, eventStartHours, startEndDiff)
+      // console.log(event, startEndDiff, eventStartHours, eventTimeSlots, enrichedEvents)
+
+      // Go through all the time slots appointed to that event
+      const totalTimeSlotsPerEvent = eventTimeSlots.length
+      eventTimeSlots.forEach((timeSlot) => {
+        const timeSlotActualHourIndex = eventStartDay * 24 + eventStartHours + timeSlot
+
+        if (totalTimeSlotsPerEvent === 1) { // if only 1 event then it's rounded edges on both ends
+          eventClass = 'between-first between-last' 
+        } else if (totalTimeSlotsPerEvent - 1 === timeSlot) { // if last element then it gets rounded edges at the bottom
+          eventClass = 'between-last' 
+        } else if (timeSlot !== 0) { // any other slot that is not start or end gets no rounded edges
+          eventClass = 'between' 
+        }
+
+        enrichedEvent = {
+          ...enrichedEvent,
+          eventClass,
+        }
+
+        let multipleTimeSlotEvents = [enrichedEvent]
+
+        // If there are multiple events for one time slot
+        if (enrichedEvents[timeSlotActualHourIndex]) {
+          multipleTimeSlotEvents = multipleTimeSlotEvents.concat(enrichedEvents[timeSlotActualHourIndex])
+          multipleTimeSlotEvents.sort((a, b) => b.startEndDiff - a.startEndDiff)
+          
+          multipleTimeSlotEvents.forEach((timeSlotEvent) => {
+            console.log(timeSlotEvent, multipleTimeSlotEvents.length)
+          })
+        }
+
+        
+        enrichedEvents = {
+          ...enrichedEvents,
+          [timeSlotActualHourIndex]: multipleTimeSlotEvents
+        }
+        // console.log(timeSlotActualHourIndex, multipleTimeSlotEvents, enrichedEvents)
+      })
+    })
+
+    console.log(enrichedEvents)
 
     return (
       <div className="App">
@@ -142,7 +210,7 @@ class App extends Component {
                               currentDate.getDay() === 0 : // Sunday
                               currentDate.getDay() === (keyDay + 1) // Other days
               }
-              
+
               return (
                 <div key={keyDay} className={isActiveDay ? 'day-label active' : 'day-label'}>
                   <div>{currentWeek.weekLabels[keyDay].label}</div>
@@ -271,7 +339,7 @@ class App extends Component {
                 }
 
                 return (
-                  <div key={hourKey} className="hour-wrapper">
+                  <div key={hourKey} id={hourKey} className="hour-wrapper">
                     { currentHourMarker === hourKey && isCurrentDateActive(currentDate) && (
                       <div className="current-hour-marker" style={{ top: `${currentMinuteMarker}rem` }}>
                         <span className="current-hour-marker-pointer"></span>
