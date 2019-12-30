@@ -4,13 +4,13 @@ import Sidebar from './components/Sidebar';
 import CreateEventPopup from './components/CreateEventPopup';
 import { totalHours, eventsMock } from './mockData';
 import { getUniqueId } from './utils/getUniqueId';
-import { calculateEvent } from './utils/calculateEvent';
 import { createOrEditEvent } from './utils/createOrEditEvent';
+import { enrichEvents, setEventsStyle } from './utils/eventUtils';
 import { isCurrentDateActive, getFormattedDate, setPreviousWeek, getCurrentWeek } from './utils/dateUtils';
 import './App.css';
 
 // TODO:
-// 1. Add overlapping events (2 during the same time)
+// 1. Fix all overlapping events scenarios
 // 2. Sidebar
 // 3. Drag and drop events
 // 4. Expand events (edit for time end)
@@ -114,102 +114,8 @@ class App extends Component {
       sidebarActive,
     } = this.state;
 
-    let timeSpanLeft = 0
-    let usedEvents = {}
-    let enrichedEvents = {}
-    let enrichedEventsSameTimeSlot = {}
-
-    clonedEvents.forEach((event) => {
-      const eventDateStart = new Date(event.startDate)
-      const eventDateEnd = new Date(event.endDate)
-      const startEndDiff = Math.abs(eventDateEnd - eventDateStart) / 3600000
-      let eventStartDay = eventDateStart.getDay() - 1
-      const eventStartHours = eventDateStart.getHours()
-      const eventEndHours = eventDateEnd.getHours()
-      const eventTimeSlots = [...Array(startEndDiff).keys()]
-      let eventClass = 'between-first'
-      let eventStyle = { width: '92%' }
-
-      let enrichedEvent = {
-        ...event,
-        eventStyle,
-        eventClass,
-        startEndDiff,
-        eventEndHours,
-        eventStartHours,
-      }
-
-      if (eventStartDay === -1) {
-        eventStartDay = 6
-      }
-
-      // Go through all the time slots appointed to that event
-      const totalTimeSlotsPerEvent = eventTimeSlots.length
-      eventTimeSlots.forEach((timeSlot) => {
-        const timeSlotActualHourIndex = eventStartDay * 24 + eventStartHours + timeSlot
-        const currentEventPerTimeSlot = enrichedEvents[timeSlotActualHourIndex]
-
-        if (totalTimeSlotsPerEvent === 1) { // if only 1 event then it's rounded edges on both ends
-          eventClass = 'between-first between-last' 
-        } else if (totalTimeSlotsPerEvent - 1 === timeSlot) { // if last element then it gets rounded edges at the bottom
-          eventClass = 'between-last' 
-        } else if (timeSlot !== 0) { // any other slot that is not start or end gets no rounded edges
-          eventClass = 'between' 
-        }
-
-        enrichedEvent = {
-          ...enrichedEvent,
-          eventClass,
-        }
-
-        let multipleTimeSlotEvents = [enrichedEvent]
-
-        // If there are multiple events for one time slot
-        if (currentEventPerTimeSlot) {
-          multipleTimeSlotEvents = multipleTimeSlotEvents.concat(currentEventPerTimeSlot)
-          multipleTimeSlotEvents.sort((a, b) => b.startEndDiff - a.startEndDiff)
-
-          multipleTimeSlotEvents.forEach((multipleTimeSlotEvent, multipleTimeSlotEventsKey) => {
-            let maxLength = multipleTimeSlotEvents.length
-            
-            if (enrichedEventsSameTimeSlot[multipleTimeSlotEvent.id] > maxLength) {
-              maxLength = enrichedEventsSameTimeSlot[multipleTimeSlotEvent.id]
-            }
-
-            enrichedEventsSameTimeSlot = {
-              ...enrichedEventsSameTimeSlot,
-              [multipleTimeSlotEvent.id]: maxLength,
-            }
-          })
-        }
-        
-        enrichedEvents = {
-          ...enrichedEvents,
-          [timeSlotActualHourIndex]: multipleTimeSlotEvents,
-        }
-      })
-    })
-
-    const clonedEnrichedEvents = {...enrichedEvents }
-    Object.entries(clonedEnrichedEvents).forEach(([enrichedEventKey, enrichedEvent]) => {
-      let updatedEnrichedEvent = []
-
-      enrichedEvent.forEach(enrichedEventTimeSlot => {
-        let updatedEnrichedEventTimeSlot = { ...enrichedEventTimeSlot }
-
-        if (enrichedEventsSameTimeSlot[enrichedEventTimeSlot.id]) {
-          updatedEnrichedEventTimeSlot = {
-            ...updatedEnrichedEventTimeSlot,
-            eventStyle: { width: `${92 / enrichedEventsSameTimeSlot[enrichedEventTimeSlot.id]}%` }
-          }
-        }
-        updatedEnrichedEvent.push(updatedEnrichedEventTimeSlot)
-      })
-
-      enrichedEvents[enrichedEventKey] = updatedEnrichedEvent
-    })
-
-    console.log(enrichedEvents)
+    let { enrichedEvents, eventsPerTimeSlot } = enrichEvents(clonedEvents)
+    enrichedEvents = setEventsStyle(enrichedEvents, eventsPerTimeSlot)
 
     return (
       <div className="App">
@@ -253,7 +159,6 @@ class App extends Component {
             <div className="hours-container">
               { totalHoursByWeek.map((_, hourKey) => {
                 const thisDate = new Date(currentWeek.weekStart)
-                const dateByHour = thisDate.setHours(hourKey)
                 const dateByHours = thisDate.getHours()
                 const defaultInputDate = getFormattedDate(thisDate)
 
@@ -276,10 +181,6 @@ class App extends Component {
                       {enrichedEvents[hourKey].map((stackedEvent, eventKey) => {
                         let eventStyle = stackedEvent.eventStyle
 
-                        if (usedEvents[stackedEvent.id]) {
-                          eventStyle = usedEvents[stackedEvent.id]
-                        }
-
                         return (
                           <div
                             ref={hourKey}
@@ -300,100 +201,6 @@ class App extends Component {
                     </React.Fragment>
                   )
                 }
-
-                // let multipleEventStack = []
-                // clonedEvents.forEach((event) => {
-                //   const existingEvent = calculateEvent(event, dateByHour, timeSpanLeft)
-                  
-                //   if (existingEvent) {
-                //     const {
-                //       firstSpanClass,
-                //       inBetweenSpanClass,
-                //       lastSpanClass,
-                //       isEqualHourStart,
-                //       eventStartHours,
-                //       eventEndHours,
-                //       eventTimeLeft,
-                //       isExpired,
-                //       startEndDiff,
-                //     } = existingEvent
-
-                //     let updatedEvent = {
-                //       ...event,
-                //       isEqualHourStart,
-                //       eventStartHours,
-                //       eventEndHours,
-                //       firstSpanClass,
-                //       inBetweenSpanClass,
-                //       lastSpanClass,
-                //       isExpired,
-                //       startEndDiff,
-                //       eventTimeLeft,
-                //     }
-
-                //     multipleEventStack.push(updatedEvent)
-                //     timeSpanLeft = eventTimeLeft
-                //   }
-                // })
-
-                // const multipleEventStackLength = multipleEventStack.length 
-              
-                // if (multipleEventStackLength > 0) {
-                //   if (multipleEventStackLength > 1) {
-                //     multipleEventStack = multipleEventStack.map((stackedEvent, eventKey) => {
-                //       let eventStyle = { width: '92%', marginLeft: '0' }
-
-                //       if (multipleEventStackLength === 2) {
-                //         switch(eventKey) {
-                //           case 1:
-                //             eventStyle = { width: '48%', marginLeft: '48%' }
-                //             break
-                //           default:
-                //             eventStyle = { width: '48%', marginLeft: '0' }
-                //         }
-                //       }
-
-                //       usedEvents = {
-                //         ...usedEvents,
-                //         [stackedEvent.id]: eventStyle,
-                //       }
-
-                //       return {
-                //         ...stackedEvent,
-                //         eventStyle,
-                //       }
-                //     })
-                //   }
-                  
-                //   hourNode = (
-                //     <React.Fragment>
-                //       {multipleEventStack.map((stackedEvent, eventKey) => {
-                //         let eventStyle = stackedEvent.eventStyle
-
-                //         if (usedEvents[stackedEvent.id]) {
-                //           eventStyle = usedEvents[stackedEvent.id]
-                //         }
-
-                //         return (
-                //           <div
-                //             ref={hourKey}
-                //             key={eventKey}
-                //             style={eventStyle}
-                //             className={`hour scheduled l${stackedEvent.label} ${stackedEvent.firstSpanClass} ${stackedEvent.inBetweenSpanClass} ${stackedEvent.lastSpanClass} ${stackedEvent.isExpired && 'expired'}`}
-                //             onClick={(event) => multipleEventStackLength > 0 ? this.handleOnEditEvent(stackedEvent, hourKey) : this.handleOnCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
-                //           >
-                //             { stackedEvent.isEqualHourStart && stackedEvent.firstSpanClass && (
-                //               <div onClick={() => this.handleOnEditEvent(stackedEvent, hourKey)}>
-                //                 <div className="event-name">{stackedEvent.name}</div>
-                //                 <div className="event-time">{stackedEvent.eventStartHours}:00 - {stackedEvent.eventEndHours}:00</div>
-                //               </div>
-                //             )}
-                //           </div>
-                //         )
-                //       })}
-                //     </React.Fragment>
-                //   )
-                // }
 
                 return (
                   <div key={hourKey} id={hourKey} className="hour-wrapper">
