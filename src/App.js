@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import CreateEventPopup from './components/CreateEventPopup';
-import { totalHours, eventsMock } from './mockData';
+import { totalHours, eventsMock, eventsMockWeek2, eventsMockWeek3 } from './mockData';
 import { getUniqueId } from './utils/getUniqueId';
 import { createOrEditEvent } from './utils/createOrEditEvent';
 import { enrichEvents, setEventsStyle } from './utils/eventUtils';
@@ -10,7 +10,10 @@ import { isCurrentDateActive, getFormattedDate, setPreviousWeek, getCurrentWeek 
 import './App.css';
 
 // TODO:
+// 1. Fix week count where month changes in the middle of the week
+// 2. Fix change previous/next week
 // 1. Fix all overlapping events scenarios
+
 // 2. Sidebar
 // 3. Drag and drop events
 // 4. Expand events (edit for time end)
