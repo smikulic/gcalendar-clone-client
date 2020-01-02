@@ -10,9 +10,8 @@ import { isCurrentDateActive, getFormattedDate, setPreviousWeek, getCurrentWeek 
 import './App.css';
 
 // TODO:
-// 1. Fix week count where month changes in the middle of the week
-// 2. Fix change previous/next week
-// 1. Fix all overlapping events scenarios
+// 1. Fix change previous/next week
+// 2. Fix all overlapping events scenarios
 
 // 2. Sidebar
 // 3. Drag and drop events
@@ -127,8 +126,8 @@ class App extends Component {
           onClickToday={() => this.changeCurrentWeek('today')}
           onClickPreviousWeek={() => this.changeCurrentWeek('previous')}
           onClickNextWeek={() => this.changeCurrentWeek('next')}
-          title={`${currentWeek.weekStart.toLocaleString('default', { month: 'long' })} ${currentWeek.weekStart.getFullYear()}`}
           onClickSidebarToggle={this.onClickSidebarToggle}
+          currentWeek={currentWeek}
         />
 
         {sidebarActive && <Sidebar />}

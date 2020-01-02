@@ -8,8 +8,14 @@ export default function Header ({
   onClickPreviousWeek,
   onClickSidebarToggle,
   onClickNextWeek,
-  title,
+  currentWeek,
 }) {
+  let headerTitle = `${currentWeek.weekStart.toLocaleString('default', { month: 'long' })} ${currentWeek.weekStart.getFullYear()}`
+
+  if (currentWeek.weekStart.getMonth() !== currentWeek.weekEnd.getMonth()) {
+    headerTitle += ` - ${currentWeek.weekEnd.toLocaleString('default', { month: 'long' })} ${currentWeek.weekEnd.getFullYear()}`
+  }
+
   return (
     <div className="header" onClick={onClick}>
       <div className="title">
@@ -29,7 +35,7 @@ export default function Header ({
         <FaChevronRight />
         </span>
       </div>
-      {title}
+      {headerTitle}
     </div>
   );
 }
