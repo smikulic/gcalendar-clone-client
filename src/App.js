@@ -56,14 +56,14 @@ class App extends Component {
     this.setState({ clonedEvents: updatedEvents, newEventDetails: {}, activeEvent: null })
   }
 
-  handleOnCreateEvent = (_, id, defaultInputDate, dateByHours) => {
+  handleOnCreateEvent = (_, id, defaultInputDate) => {
     const defaultEventDetails = {
       "event-title": '',
       "event-description": '',
       "event-start-date": defaultInputDate,
-      "event-start-time": dateByHours,
+      "event-start-time": id,
       "event-end-date": defaultInputDate,
-      "event-end-time": dateByHours + 1,
+      "event-end-time": id + 1,
     }
     this.setState({ activeEvent: id, newEventDetails: defaultEventDetails })
   }
@@ -97,11 +97,6 @@ class App extends Component {
   changeCurrentWeek = (week) => {
     const previousWeekDate = setPreviousWeek(week, this.state.currentDate)
     this.setState({ currentDate: previousWeekDate, currentWeek: getCurrentWeek(previousWeekDate) })
-  }
-
-  handleOnResize = (event, refKey) => {
-    console.log(event.clientY)
-    console.log(this.refs[refKey].clientHeight)
   }
 
   render() {
@@ -161,7 +156,6 @@ class App extends Component {
             <div className="hours-container">
               { totalHoursByWeek.map((_, hourKey) => {
                 const thisDate = new Date(currentWeek.weekStart)
-                const dateByHours = thisDate.getHours()
                 const defaultInputDate = getFormattedDate(thisDate)
 
                 const isCurrentHourActive = activeEvent === hourKey
@@ -173,7 +167,7 @@ class App extends Component {
                 let hourNode = (
                   <div
                     className={ isCurrentHourActive ? 'hour is-active' : `hour` }
-                    onClick={(event) => this.handleOnCreateEvent(event, hourKey, defaultInputDate, dateByHours)}
+                    onClick={(event) => this.handleOnCreateEvent(event, hourKey, defaultInputDate)}
                   />
                 )
 
